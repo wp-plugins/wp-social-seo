@@ -1,47 +1,67 @@
-=== Plugin Name ===
-Contributors: Jody
-Donate link: https://www.web9.co.uk
-Tags: comments, spam
-Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
+=== WP Social SEO ===
+Contributors: pigeonhut
+Donate link: 
+Tags: Social Schema, Social marketing, google schema. Google Structured Data
+Requires at least: 3.0
+Tested up to: 4.1
+Stable tag: 1.1.5
+
+WP Social SEO gives you the ability to quick add your Social Profiles in a compliant way so that it shows up in a google search.  
+
+
+== License ==
+WP Social SEO is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+WP Social SEO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with WpController Worker. If not, see <http://www.gnu.org/licenses/>.
+
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
-
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+WP Social SEO gives you the ability to quick add your Social Profiles in a compliant way so that it shows up in a google search.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+Specify your social profiles to Google
+https://developers.google.com/webmasters/structured-data/customize/social-profiles
 
-A few notes about the sections above:
+Use markup on your official website to add your social profile information to the Google Knowledge panel in some searches. Knowledge panels can prominently display your social profile information.
 
-*   "Contributors" is a comma separated list of wp.org/wp-plugins.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
+Our other free plugins can be found at https://profiles.wordpress.org/pigeonhut/
 
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
+To see more about us as a company, visit www.web9.co.uk
 
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+Proudly made in Belfast, Northern Ireland.
+
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
+install via the plugins system in WordPress or manually
+1. Upload `Zip file` to the `/wp-content/plugins/` directory & extract.
+then:
+Activate the plugin through the 'Plugins' menu in WordPress
 
-e.g.
+== Frequently asked questions ==
 
-1. Upload `wp-social.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
+
+== Screenshots ==
+
+1. structured-data.jpg
+2. 
+3.
+4.
+5.
+
+
+== Upgrade Notice ==
+de-activate existing plugin
+remove from dashboard
+activate plugin and re-add domain
+
+
+
+
+
+
+

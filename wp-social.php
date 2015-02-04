@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.0
+ * Version: 1.1
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -35,7 +35,7 @@ function wpscallWebNicePlc() {
             jQuery('#settingsID').ajaxForm({beforeSubmit: wpsValidate});
         });
         function wpsValidate() {
-            var usernameValue = jQuery('input[name=type]').fieldValue();
+            var usernameValue = jQuery('select[name=type]').fieldValue();
             var nameValue = jQuery('input[name=name]').fieldValue();
             var urlValue = jQuery('input[name=url]').fieldValue();
             var logourlValue = jQuery('input[name=logo-url]').fieldValue();
@@ -75,7 +75,17 @@ function wpscallWebNicePlc() {
                                     <tr height="50">
                                         <td width="150">Type : </td>
                                         <td>    
-                                            <input type="text" class="validate[required] text-input" id="type" name="type" value="<?php echo $get_option_details['type']; ?>" />
+                                            <select class="validate[required] text-input" id="type" name="type">
+                                                <?php
+                                                $org=''; $personal='';
+                                                if($get_option_details['type']=='Organisation')
+                                                    $org='selected="selected"';
+                                                if($get_option_details['type']=='Personal')
+                                                    $personal='selected="selected"';
+                                                ?>
+                                                <option value="Organisation" <?php echo $org;?> >Organisation</option>
+                                                <option value="Personal" <?php echo $personal;?>>Personal</option>
+                                            </select>
                                         </td>
                                     </tr>
                                     <tr height="50">

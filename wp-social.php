@@ -86,6 +86,7 @@ function wpscallWebNicePlc() {
                                                 <option value="Organization" <?php echo $org;?> >Organization</option>
                                                 <option value="Personal" <?php echo $personal;?>>Personal</option>
                                             </select>
+                                            <span style="background: none repeat scroll 0 0 #99ff99;margin: 0 0 0 224px;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
                                         </td>
                                     </tr>
                                     <tr height="50">

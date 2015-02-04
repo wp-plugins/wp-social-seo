@@ -78,12 +78,12 @@ function wpscallWebNicePlc() {
                                             <select class="validate[required] text-input" id="type" name="type">
                                                 <?php
                                                 $org=''; $personal='';
-                                                if($get_option_details['type']=='Organisation')
+                                                if($get_option_details['type']=='Organization')
                                                     $org='selected="selected"';
                                                 if($get_option_details['type']=='Personal')
                                                     $personal='selected="selected"';
                                                 ?>
-                                                <option value="Organisation" <?php echo $org;?> >Organisation</option>
+                                                <option value="Organization" <?php echo $org;?> >Organization</option>
                                                 <option value="Personal" <?php echo $personal;?>>Personal</option>
                                             </select>
                                         </td>

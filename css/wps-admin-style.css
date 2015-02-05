@@ -1,0 +1,41 @@
+.info_class{
+    background: none repeat scroll 0 0 #82CAFA;
+    margin: 0px 0px 0px 10px;
+    display: inline-block; 
+    width:450px;
+    padding:10px;
+}        
+.wp-admin select {
+    width: 190px;
+}   
+.alert-box {
+    color:#555;
+    border-radius:10px;
+    font-family:Tahoma,Geneva,Arial,sans-serif;font-size:11px;
+    padding:10px 36px;
+    margin:10px;
+}
+.alert-box span {
+    font-weight:bold;
+    text-transform:uppercase;
+}
+.errormes {
+    background:#ffecec;
+    border:1px solid #f5aca6;
+}
+.success {
+    background:#e9ffd9;
+    border:1px solid #a6ca8a;
+}
+.warning {
+    background:#fff8c4;
+    border:1px solid #f2c779;
+}
+.notice {
+    background:#e3f7fc;
+    border:1px solid #8ed9f6;
+}
+
+.form-table td {
+    vertical-align: bottom;
+}

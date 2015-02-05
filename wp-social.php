@@ -1,10 +1,10 @@
 <?php
-error_reporting(0);
+//error_reporting(0);
 /**
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.1
+ * Version: 1.2
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -14,12 +14,16 @@ error_reporting(0);
  */
 add_action('admin_menu', 'wps_admin_init');
 add_action('admin_post_submit-wnp-settings', 'wpsSaveSettings');
+add_action('admin_post_submit-wps-company', 'wpsSaveCompany');
 
 function wps_admin_init() {
-    add_menu_page(__('Wp Social', 'wps'), __('Social profile', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
+    add_menu_page(__('Structured Data', 'wps'), __('Structured Data', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
+    //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
+    add_submenu_page('', __('Social seo', 'wps'), __('Social seo', 'wps'), 'manage_options', 'wps-manage-social-seo', 'wpsmanageSocialSeo');
 }
 
 function wps_load_custom_wp_admin_style() {
+    wp_enqueue_style( 'wpsadminstyle', plugins_url('css/wps-admin-style.css', __FILE__) );
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-form');
 }
@@ -27,17 +31,29 @@ function wps_load_custom_wp_admin_style() {
 add_action('admin_enqueue_scripts', 'wps_load_custom_wp_admin_style');
 
 function wpscallWebNicePlc() {
-    $get_option_details = unserialize(get_option('wnp_social_settings'));
+    $get_option_details = unserialize(get_option('wnp_your_company'));
+    $my_plugin_tabs = array(
+        'wps-social-profile' => 'Your company',
+        'wps-manage-social-seo' => 'Social seo',
+    );
+    echo admin_tabs($my_plugin_tabs);
     ?>
+
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             // binds form submission and fields to the validation engine
-            jQuery('#settingsID').ajaxForm({beforeSubmit: wpsValidate});
+            jQuery('#companyID').ajaxForm({
+                beforeSubmit: wpsValidate,
+                success: function (data) {
+                    jQuery('.success').show();
+                }
+            });
         });
         function wpsValidate() {
             var usernameValue = jQuery('select[name=type]').fieldValue();
-            var nameValue = jQuery('input[name=name]').fieldValue();
             var urlValue = jQuery('input[name=url]').fieldValue();
+            var nameValue = jQuery('input[name=name]').fieldValue();
+            var telephone = jQuery('input[name=telephone]').fieldValue();
             var logourlValue = jQuery('input[name=logo-url]').fieldValue();
             // usernameValue and passwordValue are arrays but we can do simple
             // "not" tests to see if the arrays are empty
@@ -57,38 +73,42 @@ function wpscallWebNicePlc() {
                 alert('Please enter a value for the Logo url');
                 return false;
             }
+            if (!telephone[0]) {
+                alert('Please enter telephone number');
+                return false;
+            }
             return true;
         }
-    </script>
+    </script>    
     <div class="wrap">        
-        <h2><?php _e('Wp Social profile settings', 'wnp'); ?></h2> 
+        <h2><?php _e('Your company', 'wps'); ?></h2> 
         <div id="poststuff" class="metabox-holder ppw-settings">
             <div class="postbox" id="ppw_global_postbox">               
                 <div class="inside">                               
-                    <form id="settingsID" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
+                    <form id="companyID" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
                         <fieldset>                            
-                            <input type='hidden' name='action' value='submit-wnp-settings' />
-                            <input type='hidden' name='id' value='<?php echo $getId ?>' />
-                            <input type='hidden' name='paged' value='<?php echo $_GET['paged']; ?>' />
+                            <input type='hidden' name='action' value='submit-wps-company' />                            
                             <div>
+                                <div class="alert-box success" style="display:none;"><span>Success : </span>Your company settings has been saved successfully</div>
                                 <table cellpadding="0" cellspacing="0" border="0" width="600" class="form-table">
                                     <tr height="50">
                                         <td width="150">Type : </td>
                                         <td>    
                                             <select class="validate[required] text-input" id="type" name="type">
                                                 <?php
-                                                $org=''; $personal='';
-                                                if($get_option_details['type']=='Organization')
-                                                    $org='selected="selected"';
-                                                if($get_option_details['type']=='Personal')
-                                                    $personal='selected="selected"';
+                                                $org = '';
+                                                $personal = '';
+                                                if ($get_option_details['type'] == 'Organization')
+                                                    $org = 'selected="selected"';
+                                                if ($get_option_details['type'] == 'Personal')
+                                                    $personal = 'selected="selected"';
                                                 ?>
-                                                <option value="Organization" <?php echo $org;?> >Organization</option>
-                                                <option value="Personal" <?php echo $personal;?>>Personal</option>
+                                                <option value="Organization" <?php echo $org; ?> >Organization</option>
+                                                <option value="Personal" <?php echo $personal; ?>>Personal</option>
                                             </select>
                                             <span style="background: none repeat scroll 0 0 #99ff99;margin: 0 0 0 224px;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
                                         </td>
-                                    </tr>
+                                    </tr>     
                                     <tr height="50">
                                         <td>Name : </td>
                                         <td><input type="text" class="validate[required] text-input" id="name" name="name" value="<?php echo $get_option_details['name']; ?>" /></td>
@@ -102,8 +122,112 @@ function wpscallWebNicePlc() {
                                         <td><input type="text" class="validate[required] text-input" id="logo-url" name="logo-url" value="<?php echo $get_option_details['logo-url']; ?>" /></td>
                                     </tr>
                                     <tr height="50">
+                                        <td>Telephone : </td>
+                                        <td><input type="text" class="validate[required] text-input" id="telephone" name="telephone" value="<?php echo $get_option_details['telephone']; ?>" /> </td>
+                                    </tr>
+<!--                                    <tr height="50">
+                                        <td>Other telephone : </td>
+                                        <td><input type="text" class="validate[required] text-input" id="other_telephone" name="other_telephone" value="<?php echo $get_option_details['other_telephone']; ?>" /> </td>
+                                    </tr>-->
+                                    <tr height="50">
+                                        <td>Contact Type : </td>
+                                        <td>
+                                            <select class="validate[required] text-input" id="type" name="contact_type">
+                                                <option value="">Select contact type</option>
+                                                <?php
+                                                $contact_types = array('customer support', 'technical support', 'billing support', 'bill payment', 'sales', 'reservations', 'credit card support', 'emergency', 'baggage tracking', 'roadside assistance', 'package tracking');
+                                                foreach ($contact_types as $contact_type) {
+                                                    if ($get_option_details['contact_type'] == $contact_type) {
+                                                        $selected_contact_type = 'selected="selected"';
+                                                    } else {
+                                                        $selected_contact_type = '';
+                                                    }
+                                                    echo '<option value="' . $contact_type . '" ' . $selected_contact_type . '>' . ucfirst($contact_type) . '</option>';
+                                                }
+                                                ?>                                                                                                
+                                            </select>                                            
+                                        </td>
+                                    </tr>
+                                    <tr height="50">
+                                        <td>Area served : </td>
+                                        <td><input type="text" class="text-input" id="area_served" name="area_served" value="<?php echo $get_option_details['area_served']; ?>" />
+                                            <span class="info_class">Countries may be specified concisely using just their standard ISO-3166 two-letter code, for example US, CA, MX</span>
+                                        </td>
+                                    </tr>
+<!--                                    <tr height="50">
+                                        <td>Contact option: </td>
+                                        <td>
+                                            <select class="validate[required] text-input" id="contact_option" name="contact_option[]" multiple="multiple">
+                                                <option value="">Select contact option</option>
+                                                <?php
+                                                $explaoded_ct_options = explode(',', $get_option_details['contact_option']);
+                                                foreach ($explaoded_ct_options as $explaoded_ct_option) {
+                                                    if ($explaoded_ct_option == 'TollFree')
+                                                        $tollfree = 'selected="selected"';
+                                                    if ($explaoded_ct_option == 'HearingImpairedSupported')
+                                                        $hearing = 'selected="selected"';
+                                                }
+                                                ?>
+                                                <option value="TollFree" <?php echo $tollfree; ?> >TollFree</option>
+                                                <option value="HearingImpairedSupported" <?php echo $hearing; ?>>HearingImpairedSupported</option>
+                                            </select>
+                                        </td>
+                                    </tr>-->
+                                    <tr height="50">
+                                        <td>Available language : </td>
+                                        <td>
+                                            <input type="text" id="avail_language" name="avail_language" value="<?php echo $get_option_details['avail_language']; ?>" />
+                                            <span class="info_class">Optional details about the language spoken. Languages may be specified by their common English name. If omitted, the language defaults to English, for example French, English</span>
+                                        </td>
+                                    </tr>                                                                        
+                                </table>
+                            </div>                         
+                            <input class="button-primary" type="submit" value="Submit" name="submit" />    
+                        </fieldset>
+                    </form>
+                </div>
+            </div>           
+        </div>
+    </div>
+    <?php
+}
+
+function wpsmanageSocialSeo() {
+    $get_option_details = unserialize(get_option('wnp_social_settings'));
+    $my_plugin_tabs = array(
+        'wps-social-profile' => 'Your company',
+        'wps-manage-social-seo' => 'Social seo',
+    );
+    echo admin_tabs($my_plugin_tabs);
+    ?>
+    <script>
+        jQuery(document).ready(function () {
+            // binds form submission and fields to the validation engine
+            jQuery('#settingsID').ajaxForm({
+                success: function (data) {
+                    jQuery('.success').show();
+                }
+            });
+        });
+    </script>    
+    <div class="wrap">        
+        <h2><?php _e('Wp Social profile settings', 'wnp'); ?></h2> 
+        <div id="poststuff" class="metabox-holder ppw-settings">
+            <div class="postbox" id="ppw_global_postbox">               
+                <div class="inside">                               
+                    <form id="settingsID" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
+                        <fieldset>                            
+                            <input type='hidden' name='action' value='submit-wnp-settings' />
+                            <input type='hidden' name='id' value='<?php echo $getId ?>' />
+                            <input type='hidden' name='paged' value='<?php echo $_GET['paged']; ?>' />
+                            <div>
+                                <div class="alert-box success" style="display:none;"><span>Success : </span>Social profile settings has been saved successfully</div>
+                                <table cellpadding="0" cellspacing="0" border="0" width="600" class="form-table">                                    
+                                    <tr height="50">
                                         <td>Facebook : </td>
-                                        <td><input type="text" class="validate[required] text-input" id="facebook" name="facebook" value="<?php echo $get_option_details['facebook']; ?>" /> </td>
+                                        <td><input type="text" class="validate[required] text-input" id="facebook" name="facebook" value="<?php echo $get_option_details['facebook']; ?>" />
+                                            <span style="background: none repeat scroll 0 0 #99ff99;margin: 0 0 0 224px;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
+                                        </td>
                                     </tr>
                                     <tr height="50">
                                         <td>Twitter : </td>
@@ -139,7 +263,28 @@ function wpscallWebNicePlc() {
             </div>           
         </div>
     </div>
+
     <?php
+}
+
+function admin_tabs($tabs, $current = NULL) {
+    if (is_null($current)) {
+        if (isset($_GET['page'])) {
+            $current = $_GET['page'];
+        }
+    }
+    $content = '';
+    $content .= '<h2 class="nav-tab-wrapper">';
+    foreach ($tabs as $location => $tabname) {
+        if ($current == $location) {
+            $class = ' nav-tab-active';
+        } else {
+            $class = '';
+        }
+        $content .= '<a class="nav-tab' . $class . '" href="?page=' . $location . '">' . $tabname . '</a>';
+    }
+    $content .= '</h2>';
+    return $content;
 }
 
 function wpsSaveSettings() {
@@ -147,14 +292,6 @@ function wpsSaveSettings() {
     global $wpdb;
     if (isset($_POST['submit'])) {
         $insertArray = array();
-        if ($_POST['type'] != '')
-            $insertArray['type'] = sanitize_text_field($_POST['type']);
-        if ($_POST['name'] != '')
-            $insertArray['name'] = sanitize_text_field($_POST['name']);
-        if ($_POST['url'] != '')
-            $insertArray['url'] = esc_url($_POST['url']);
-        if ($_POST['logo-url'] != '')
-            $insertArray['logo-url'] = esc_url($_POST['logo-url']);
         if ($_POST['facebook'] != '')
             $insertArray['facebook'] = sanitize_text_field($_POST['facebook']);
         if ($_POST['twitter'] != '')
@@ -178,38 +315,113 @@ function wpsSaveSettings() {
     }
 }
 
+function wpsSaveCompany() {
+    session_start();
+    global $wpdb;
+    if (isset($_POST['submit'])) {
+        $insertArray = array();
+        if ($_POST['type'] != '')
+            $insertArray['type'] = sanitize_text_field($_POST['type']);
+        if ($_POST['name'] != '')
+            $insertArray['name'] = sanitize_text_field($_POST['name']);
+        if ($_POST['url'] != '')
+            $insertArray['url'] = esc_url($_POST['url']);
+        if ($_POST['logo-url'] != '')
+            $insertArray['logo-url'] = esc_url($_POST['logo-url']);
+        if ($_POST['telephone'] != '')
+            $insertArray['telephone'] = sanitize_text_field($_POST['telephone']);
+//        if ($_POST['other_telephone'] != '')
+//            $insertArray['other_telephone'] = sanitize_text_field($_POST['other_telephone']);
+        if ($_POST['contact_type'] != '')
+            $insertArray['contact_type'] = sanitize_text_field($_POST['contact_type']);
+        if ($_POST['area_served'] != '')
+            $insertArray['area_served'] = sanitize_text_field($_POST['area_served']);
+//        if ($_POST['contact_option'] != '' && !empty($_POST['contact_option']))
+//            $insertArray['contact_option'] = sanitize_text_field(implode(',', $_POST['contact_option']));
+        if ($_POST['avail_language'] != '')
+            $insertArray['avail_language'] = sanitize_text_field($_POST['avail_language']);
+        if (!empty($insertArray)) {
+            $serialize_array = serialize($insertArray);
+            update_option('wnp_your_company', $serialize_array);
+            $_SESSION['area_status'] = 'updated';
+        }
+        // wp_redirect(admin_url('admin.php?page=web-nine-plc'));
+    }
+}
+
 add_action('wp_footer', 'wps_buffer_end');
 
 function wps_buffer_end() {
     $get_option_details = unserialize(get_option('wnp_social_settings'));
-    $wpsFacebook = '';
-    $wpsTwitter = '';
-    $wpsGoogle = '';
-    $wpsInstagram = '';
-    $wpsYoutube = '';
-    $wpsLinkedin = '';
-    $wpsMyspace = '';
+    $get_company_option_details = unserialize(get_option('wnp_your_company'));
+    $display_social = '';
     if (isset($get_option_details['facebook']))
-        $wpsFacebook = $get_option_details['facebook'];
+        $display_social .= '"' . $get_option_details['facebook'] . '",';
     if (isset($get_option_details['twitter']))
-        $wpsTwitter = $get_option_details['twitter'];
+        $display_social .= '"' . $get_option_details['twitter'] . '",';
     if (isset($get_option_details['googleplus']))
-        $wpsGoogle = $get_option_details['googleplus'];
+        $display_social .= '"' . $get_option_details['googleplus'] . '",';
     if (isset($get_option_details['instagram']))
-        $wpsInstagram = $get_option_details['instagram'];
+        $display_social .= '"' . $get_option_details['instagram'] . '",';
     if (isset($get_option_details['youtube']))
-        $wpsYoutube = $get_option_details['youtube'];
+        $display_social .= '"' . $get_option_details['youtube'] . '",';
     if (isset($get_option_details['linkedin']))
-        $wpsLinkedin = $get_option_details['linkedin'];
+        $display_social .= '"' . $get_option_details['linkedin'] . '",';
     if (isset($get_option_details['myspace']))
-        $wpsMyspace = $get_option_details['myspace'];
-    echo '<script type="application/ld+json">
+        $display_social .= '"' . $get_option_details['myspace'] . '",';
+    $display_social = rtrim($display_social, ",");
+
+    $displayOut = '';
+    if (isset($get_company_option_details['telephone'])) {
+        $expl_telephone = explode(',', $get_company_option_details['telephone']);
+        if (count($expl_telephone) == 1) {
+            $displayOut .='"telephone" : "' . $get_company_option_details['telephone'] . '",';
+        } else {
+            $parts = split(',', $get_company_option_details['telephone']);
+            $displayOut .='"telephone" : ["' . join('", "', $parts) . '"],';
+        }
+    }
+    if (isset($get_company_option_details['contact_type']))
+        $displayOut .='"contactType" : "' . $get_company_option_details['contact_type'] . '",';
+    if (isset($get_company_option_details['contact_option']) && !empty($get_company_option_details['contact_option'])) {
+        $expl_contact_option = explode(',', $get_company_option_details['contact_option']);
+        if (count($expl_contact_option) == 1) {
+            $displayOut .='"contactOption" : "' . $get_company_option_details['contact_option'] . '",';
+        } else {
+            $parts = split(',', $get_company_option_details['contact_option']);
+            $displayOut .='"contactOption" : ["' . join('", "', $parts) . '"],';
+        }
+    }
+    if (isset($get_company_option_details['area_served']) && !empty($get_company_option_details['area_served'])) {
+        $expl_area_served = explode(',', $get_company_option_details['area_served']);
+        if (count($expl_area_served) == 1) {
+            $displayOut .='"areaServed" : "' . $get_company_option_details['area_served'] . '",';
+        } else {
+            $parts = split(',', $get_company_option_details['area_served']);
+            $displayOut .='"areaServed" : ["' . join('", "', $parts) . '"],';
+        }
+    }
+    if (isset($get_company_option_details['avail_language'])) {
+        $expl_avail_language = explode(',', $get_company_option_details['avail_language']);
+        if (count($expl_avail_language) == 1) {
+            $displayOut .='"availableLanguage" : "' . $get_company_option_details['avail_language'] . '"';
+        } else {
+            $parts = split(',', $get_company_option_details['avail_language']);
+            $displayOut .='"availableLanguage" : ["' . join('", "', $parts) . '"]';
+        }
+    }
+    $displayOut = rtrim($displayOut, ",");
+        echo '<script type="application/ld+json">
 { "@context" : "http://schema.org",
-  "@type" : "' . $get_option_details['type'] . '",
-  "name" : "' . $get_option_details['name'] . '",
-  "url" : "' . $get_option_details['url'] . '",
-  "logo": "' . $get_option_details['logo-url'] . '",
-  "sameAs" : [ "' . $wpsFacebook . '","' . $wpsTwitter . '","' . $wpsGoogle . '","' . $wpsInstagram . '","' . $wpsYoutube . '","' . $wpsLinkedin . '","' . $wpsMyspace . '"] 
+  "@type" : "' . $get_company_option_details['type'] . '",
+  "name" : "' . $get_company_option_details['name'] . '",
+  "url" : "' . $get_company_option_details['url'] . '",
+  "logo": "' . $get_company_option_details['logo-url'] . '",
+  "sameAs" : [' . $display_social . '],
+      "contactPoint" : [
+    { "@type" : "ContactPoint",
+      ' . $displayOut . '
+    } ]
 }
 </script>
 ';

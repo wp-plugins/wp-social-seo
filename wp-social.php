@@ -4,7 +4,7 @@
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.2
+ * Version: 1.3
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -15,15 +15,16 @@
 add_action('admin_menu', 'wps_admin_init');
 add_action('admin_post_submit-wnp-settings', 'wpsSaveSettings');
 add_action('admin_post_submit-wps-company', 'wpsSaveCompany');
-
+add_action('admin_post_submit-facebook-review', 'wpsFacebookReview');
 function wps_admin_init() {
     add_menu_page(__('Structured Data', 'wps'), __('Structured Data', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
     //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
     add_submenu_page('', __('Social seo', 'wps'), __('Social seo', 'wps'), 'manage_options', 'wps-manage-social-seo', 'wpsmanageSocialSeo');
+    add_submenu_page('', __('Facebook review', 'wps'), __('Facebook review', 'wps'), 'manage_options', 'wps-facebook-review', 'wpsmanageFacebookReview');
 }
 
 function wps_load_custom_wp_admin_style() {
-    wp_enqueue_style( 'wpsadminstyle', plugins_url('css/wps-admin-style.css', __FILE__) );
+    wp_enqueue_style('wpsadminstyle', plugins_url('css/wps-admin-style.css', __FILE__));
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-form');
 }
@@ -35,6 +36,7 @@ function wpscallWebNicePlc() {
     $my_plugin_tabs = array(
         'wps-social-profile' => 'Your company',
         'wps-manage-social-seo' => 'Social seo',
+        'wps-facebook-review' => 'Facebook review',
     );
     echo admin_tabs($my_plugin_tabs);
     ?>
@@ -125,7 +127,7 @@ function wpscallWebNicePlc() {
                                         <td>Telephone : </td>
                                         <td><input type="text" class="validate[required] text-input" id="telephone" name="telephone" value="<?php echo $get_option_details['telephone']; ?>" /> </td>
                                     </tr>
-<!--                                    <tr height="50">
+    <!--                                    <tr height="50">
                                         <td>Other telephone : </td>
                                         <td><input type="text" class="validate[required] text-input" id="other_telephone" name="other_telephone" value="<?php echo $get_option_details['other_telephone']; ?>" /> </td>
                                     </tr>-->
@@ -154,20 +156,20 @@ function wpscallWebNicePlc() {
                                             <span class="info_class">Countries may be specified concisely using just their standard ISO-3166 two-letter code, for example US, CA, MX</span>
                                         </td>
                                     </tr>
-<!--                                    <tr height="50">
+    <!--                                    <tr height="50">
                                         <td>Contact option: </td>
                                         <td>
                                             <select class="validate[required] text-input" id="contact_option" name="contact_option[]" multiple="multiple">
                                                 <option value="">Select contact option</option>
-                                                <?php
-                                                $explaoded_ct_options = explode(',', $get_option_details['contact_option']);
-                                                foreach ($explaoded_ct_options as $explaoded_ct_option) {
-                                                    if ($explaoded_ct_option == 'TollFree')
-                                                        $tollfree = 'selected="selected"';
-                                                    if ($explaoded_ct_option == 'HearingImpairedSupported')
-                                                        $hearing = 'selected="selected"';
-                                                }
-                                                ?>
+                                    <?php
+                                    $explaoded_ct_options = explode(',', $get_option_details['contact_option']);
+                                    foreach ($explaoded_ct_options as $explaoded_ct_option) {
+                                        if ($explaoded_ct_option == 'TollFree')
+                                            $tollfree = 'selected="selected"';
+                                        if ($explaoded_ct_option == 'HearingImpairedSupported')
+                                            $hearing = 'selected="selected"';
+                                    }
+                                    ?>
                                                 <option value="TollFree" <?php echo $tollfree; ?> >TollFree</option>
                                                 <option value="HearingImpairedSupported" <?php echo $hearing; ?>>HearingImpairedSupported</option>
                                             </select>
@@ -197,6 +199,7 @@ function wpsmanageSocialSeo() {
     $my_plugin_tabs = array(
         'wps-social-profile' => 'Your company',
         'wps-manage-social-seo' => 'Social seo',
+        'wps-facebook-review' => 'Facebook review',
     );
     echo admin_tabs($my_plugin_tabs);
     ?>
@@ -265,6 +268,146 @@ function wpsmanageSocialSeo() {
     </div>
 
     <?php
+}
+
+function wpsmanageFacebookReview() {
+    $get_option_details = unserialize(get_option('wnp_facebook_reviews'));
+    $otpr = '';
+    $i = 1;
+    foreach ($get_option_details['name'] as $get_all_names) {
+        $otpr .= '<div style="padding: 10px; display: block;" class="clonedInput" id="entry' . $i . '">';
+        $otpr .='<fieldset>';
+        $otpr .='<label for="ID' . $i . '_reviewer-name" class="label_fn">Reviewer\'s Name: </label>';
+        $otpr .='<input type="text" value="' . $get_all_names . '" id="ID' . $i . '_reviewer-name" name="reviewer-name[]" class="input_fn">';
+        $otpr .='<label for="ID' . $i . '_post_id" class="label_ln">Post Id: </label>';
+        $otpr .='<input type="text" value="' . $get_option_details['id'][$i - 1] . '" id="ID' . $i . '_post_id" name="post_id[]" class="input_ln">';
+        $otpr .='</fieldset>';
+        $otpr .='</div>';
+        $i++;
+    }
+    $my_plugin_tabs = array(
+        'wps-social-profile' => 'Your company',
+        'wps-manage-social-seo' => 'Social seo',
+        'wps-facebook-review' => 'Facebook review',
+    );
+    echo admin_tabs($my_plugin_tabs);
+    ?>
+    <script>
+        jQuery(document).ready(function () {
+            // binds form submission and fields to the validation engine
+            jQuery('#facebookReview').ajaxForm({
+                success: function (data) {
+                    jQuery('.success').show();
+                }
+            });
+            jQuery('#btnAdd').click(function () {
+                var num = jQuery('.clonedInput').length, // Checks to see how many "duplicatable" input fields we currently have
+                        newNum = new Number(num + 1), // The numeric ID of the new input field being added, increasing by 1 each time
+                        newElem = jQuery('#entry' + num).clone().attr('id', 'entry' + newNum).fadeIn('fast'); // create the new element via clone(), and manipulate it's ID using newNum value
+                // First name - text
+                newElem.find('.label_fn').attr('for', 'ID' + newNum + '_reviewer-name');
+                newElem.find('.input_fn').attr('id', 'ID' + newNum + '_reviewer-name').attr('name', 'reviewer-name[]').val('');
+
+                // Last name - text
+                newElem.find('.label_ln').attr('for', 'ID' + newNum + '_post_id');
+                newElem.find('.input_ln').attr('id', 'ID' + newNum + '_post_id').attr('name', 'post_id[]').val('');
+
+                // Insert the new element after the last "duplicatable" input field
+                jQuery('#entry' + num).after(newElem);
+                jQuery('#ID' + newNum + '_reviewer-name').focus();
+
+                // Enable the "remove" button. This only shows once you have a duplicated section.
+                jQuery('#btnDel').attr('disabled', false);
+
+                // Right now you can only add 4 sections, for a total of 5. Change '5' below to the max number of sections you want to allow.
+                //if (newNum == 5)
+                //jQuery('#btnAdd').attr('disabled', true).prop('value', "You've reached the limit"); // value here updates the text in the 'add' button when the limit is reached 
+            });
+            jQuery('#btnDel').click(function () {
+                // Confirmation dialog box. Works on all desktop browsers and iPhone.
+                //                if (confirm("Are you sure you wish to remove this section? This cannot be undone."))
+                //                {
+                var num = jQuery('.clonedInput').length;
+                // how many "duplicatable" input fields we currently have
+                jQuery('#entry' + num).slideUp('fast', function () {
+                    jQuery(this).remove();
+                    // if only one element remains, disable the "remove" button
+                    if (num - 1 === 1)
+                        jQuery('#btnDel').attr('disabled', true);
+                    // enable the "add" button
+                    jQuery('#btnAdd').attr('disabled', false).prop('value', "add section");
+                });
+                //}
+                return false; // Removes the last section you added
+            });
+            // Enable the "add" button
+            jQuery('#btnAdd').attr('disabled', false);
+    <?php if (empty($get_option_details)) { ?>
+                // Disable the "remove" button
+                jQuery('#btnDel').attr('disabled', true);
+    <?php } ?>
+        });
+    </script>
+    <div class="wrap">        
+        <h2><?php _e('Facebook Reviews', 'wnp'); ?></h2> 
+        <div id="poststuff" class="metabox-holder ppw-settings">
+            <div class="postbox" id="ppw_global_postbox">               
+                <div class="inside">                               
+                    <form id="facebookReview" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
+                        <fieldset>                            
+                            <input type='hidden' name='action' value='submit-facebook-review' />
+                            <input type='hidden' name='id' value='<?php echo $getId ?>' />
+                            <input type='hidden' name='paged' value='<?php echo $_GET['paged']; ?>' />
+                            <div>
+                                <div class="alert-box success" style="display:none;"><span>Success : </span>Facebook review settings has been saved successfully</div>
+                                <div style='float:left;'>
+                                    <?php if (empty($get_option_details)) { ?>
+                                        <div id="entry1" class="clonedInput" style="padding: 10px ;">                              
+                                            <fieldset>
+                                                <label class="label_fn" for="reviewer-name">Reviewer's Name: </label>
+                                                <input class="input_fn" type="text" name="reviewer-name[]" id="reviewer-name" value="">
+
+                                                <label class="label_ln" for="post_id">Post Id: </label>
+                                                <input class="input_ln" type="text" name="post_id[]" id="post_id" value="">
+                                            </fieldset>            
+                                        </div><!-- end #entry1 -->  
+                                        <?php
+                                    } else {
+                                        echo $otpr;
+                                    }
+                                    ?>
+                                </div>
+                                <div id="addDelButtons" style='float:left;padding: 10px ;'>
+                                    <input class='button-primary' type="button" id="btnAdd" value="add section"> 
+                                    <input class='button-primary' type="button" id="btnDel" value="remove section above">
+                                </div>
+                            </div> 
+                            <div style='float:none;clear:both;'>
+                                <input class="button-primary" type="submit" value="Submit" name="submit" />    
+                            </div>                            
+                        </fieldset>
+                    </form>
+                </div>
+            </div>           
+        </div>
+    </div>
+    <?php
+}
+
+function wpsFacebookReview() {
+    session_start();
+    global $wpdb;
+    echo '<pre>';
+    print_r($_POST);
+    echo '</pre>';
+    if (isset($_POST['submit'])) {
+        $insertArray = array();
+        $insertArray['name'] = $_POST['reviewer-name'];
+        $insertArray['id'] = $_POST['post_id'];
+        $serialize_array = serialize($insertArray);
+        update_option('wnp_facebook_reviews', $serialize_array);
+        $_SESSION['area_status'] = 'updated';
+    }
 }
 
 function admin_tabs($tabs, $current = NULL) {
@@ -411,7 +554,7 @@ function wps_buffer_end() {
         }
     }
     $displayOut = rtrim($displayOut, ",");
-        echo '<script type="application/ld+json">
+    echo '<script type="application/ld+json">
 { "@context" : "http://schema.org",
   "@type" : "' . $get_company_option_details['type'] . '",
   "name" : "' . $get_company_option_details['name'] . '",
@@ -426,3 +569,4 @@ function wps_buffer_end() {
 </script>
 ';
 }
+?>

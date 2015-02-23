@@ -4,7 +4,7 @@
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.3
+ * Version: 1.4
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -16,6 +16,8 @@ add_action('admin_menu', 'wps_admin_init');
 add_action('admin_post_submit-wnp-settings', 'wpsSaveSettings');
 add_action('admin_post_submit-wps-company', 'wpsSaveCompany');
 add_action('admin_post_submit-facebook-review', 'wpsFacebookReview');
+add_shortcode('facebook-review-slider', 'bartag_func');
+
 function wps_admin_init() {
     add_menu_page(__('Structured Data', 'wps'), __('Structured Data', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
     //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
@@ -397,9 +399,6 @@ function wpsmanageFacebookReview() {
 function wpsFacebookReview() {
     session_start();
     global $wpdb;
-    echo '<pre>';
-    print_r($_POST);
-    echo '</pre>';
     if (isset($_POST['submit'])) {
         $insertArray = array();
         $insertArray['name'] = $_POST['reviewer-name'];
@@ -568,5 +567,33 @@ function wps_buffer_end() {
 }
 </script>
 ';
+}
+
+add_filter('widget_text', 'do_shortcode');
+
+function bartag_func($atts) {
+    wp_enqueue_style('carouselcss', plugins_url('css/jquery.bxslider.css', __FILE__));
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
+    $get_option_details = unserialize(get_option('wnp_facebook_reviews'));
+    $names = $get_option_details['name'];
+    $i = 1;
+    $render = '';
+    $render .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
+    $render .='<script>jQuery(document).ready(function () {
+        jQuery(\'.bxslider\').bxSlider({
+        pager :false,
+        auto:true       
+        });        
+        });</script>       
+                    <ul class="bxslider">';
+    foreach ($names as $name) {
+        $render .= '<li><div style = "float:left;" class = "fb-post" data-href = "https://www.facebook.com/' . $name . '/posts/' . $get_option_details['id'][$i - 1] . '" data-width = "295px">
+        <div class = "fb-xfbml-parse-ignore">Post by ' . str_replace('.', ' ', $name) . '.</div>
+        </div></li>';
+        $i++;
+    }
+    $render .=' </ul>';
+    echo $render;
 }
 ?>

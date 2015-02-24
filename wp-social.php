@@ -4,7 +4,7 @@
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.5
+ * Version: 1.6
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -585,8 +585,8 @@ function bartag_func($atts) {
         pager :false,
         auto:true,
         mode:\'fade\',
-        speed: 500,
-        pause:3000,
+        speed: 1000,
+        pause:10000,
         controls:false,
         autoHover:true
         });        

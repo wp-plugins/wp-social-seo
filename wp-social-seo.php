@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.9
+ * Version: 1.10
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -933,11 +933,11 @@ function display_rich_snippets() {
             <div class="hms-testimonial-container" itemscope itemtype="http://data-vocabulary.org/Review">
                 <div class="testimonial">
                     <div class="top-class">                    
-                        <div class="gnrl-class" itemprop="itemreviewed">' . $List->item_name . '</div>
-                        <div class="gnrl-class" itemprop="description">' . $List->description . '</div>
+                        <div class="gnrl-class" itemprop="itemreviewed">' . stripcslashes($List->item_name) . '</div>
+                        <div class="gnrl-class" itemprop="description">' . stripcslashes($List->description) . '</div>
                     </div>
                     <div class="bottom-class">
-                        <div class="gnrl-new-class" itemprop="reviewer">Reviewed by <i><a href="' . $List->url . '" target="_blank">' . $List->reviewer_name . '</a></i> on <time itemprop="dtreviewed" datetime="' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
+                        <div class="gnrl-new-class" itemprop="reviewer">Reviewed by <i><a href="' . $List->url . '" target="_blank">' . stripcslashes($List->reviewer_name) . '</a></i> on <time itemprop="dtreviewed" datetime="' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
                         <div class="gnrl-new-class" itemprop="rating"><div class="basic" data-average="' . $List->rating . '" data-id="1"></div></div>
                     </div>
                 </div>

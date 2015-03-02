@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.7
+ * Version: 1.8
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -12,6 +12,9 @@ error_reporting(0);
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+if (!class_exists('Wps_Review_List_Table')) {
+    require_once( plugin_dir_path(__FILE__) . 'class/class-wps-review-list-table.php' );
+}
 add_action('admin_menu', 'wps_admin_init');
 add_action('admin_post_submit-wnp-settings', 'wpsSaveSettings');
 add_action('admin_post_submit-wps-company', 'wpsSaveCompany');
@@ -39,6 +42,8 @@ function wps_admin_init() {
     add_submenu_page('', __('Social seo', 'wps'), __('Social seo', 'wps'), 'manage_options', 'wps-manage-social-seo', 'wpsmanageSocialSeo');
     add_submenu_page('', __('Facebook review', 'wps'), __('Facebook review', 'wps'), 'manage_options', 'wps-facebook-review', 'wpsmanageFacebookReview');
     add_submenu_page('', __('Rich snippets review', 'wps'), __('Rich snippets review', 'wps'), 'manage_options', 'wps-rich-snippets-review', 'wpsmanageRichSnippets');
+    add_submenu_page('', __('Rich snippets review', 'wps'), __('Rich snippets review', 'wps'), 'manage_options', 'wps-add-rich-snippets-review', 'wpsmanageAddRichSnippets');
+    add_submenu_page('', __('Rich snippets review', 'wps'), __('Rich snippets review', 'wps'), 'manage_options', 'wps-delete-snipepts-review', 'wpsmanageDeleteRichSnippets');
 }
 
 function wps_load_custom_wp_admin_style() {
@@ -415,7 +420,29 @@ function wpsmanageFacebookReview() {
     <?php
 }
 
-function wpsmanageRichSnippets() {
+function wpsmanageAddRichSnippets() {
+    session_start();
+    global $wpdb;
+    if ($_REQUEST['action'] == 'edit' && $_REQUEST['review'] != '') {
+        $getItemname = '';
+        $getReviewername = '';
+        $getDate = '';
+        $getSummary = '';
+        $getDescription = '';
+        $getStatus = '';
+        $getRating = '';
+        $getDetails = $wpdb->get_row('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review WHERE id=' . $_REQUEST['review']);
+        if ($getDetails != NULL) {
+            $getId = $getDetails->id;
+            $getItemname = $getDetails->item_name;
+            $getReviewername = $getDetails->reviewer_name;
+            $getDate = $getDetails->date_reviewed;
+            $getSummary = $getDetails->summary;
+            $getDescription = $getDetails->description;
+            $getStatus = $getDetails->status;
+            $getRating = $getDetails->rating;
+        }
+    }
     $my_plugin_tabs = array(
         'wps-social-profile' => 'Your company',
         'wps-manage-social-seo' => 'Social seo',
@@ -481,37 +508,104 @@ function wpsmanageRichSnippets() {
                             <input type='hidden' name='id' value='<?php echo $getId ?>' />
                             <input type='hidden' name='paged' value='<?php echo $_GET['paged']; ?>' />
                             <div>
-                                <div class="alert-box success" style="display:none;"><span>Success : </span>Social profile settings has been saved successfully</div>
+                                <div class="alert-box success" style="display:none;"><span>Success : </span>Your review has been added</div>
                                 <table cellpadding="0" cellspacing="0" border="0" width="600" class="form-table">                                    
                                     <tr height="50">
                                         <td>Item name : </td>
-                                        <td><input type="text" class="validate[required] text-input" id="item-name" name="item-name" value="<?php echo $get_option_details['facebook']; ?>" />                                           
+                                        <td><input type="text" class="validate[required] text-input" id="item-name" name="item-name" value="<?php echo $getItemname; ?>" />                                           
                                         </td>
                                     </tr>
                                     <tr height="50">
                                         <td>Reviewer name : </td>
-                                        <td><input type="text" id="reviewer-name" name="reviewer-name" value="<?php echo $get_option_details['twitter']; ?>" /></td>
+                                        <td><input type="text" id="reviewer-name" name="reviewer-name" value="<?php echo $getReviewername; ?>" /></td>
                                     </tr>
                                     <tr height="50">
                                         <td>Date reviewed : </td>
-                                        <td><input type="text"  id="date-reviewed" name="date-reviewed" value="<?php echo $get_option_details['googleplus']; ?>" /></td>
+                                        <td><input type="text"  id="date-reviewed" name="date-reviewed" value="<?php echo $getDate; ?>" /></td>
                                     </tr>
                                     <tr height="50">
                                         <td>Summary : </td>
-                                        <td><input type="text" id="summary" name="summary" value="<?php echo $get_option_details['instagram']; ?>" /></td>
+                                        <td><input type="text" id="summary" name="summary" value="<?php echo $getSummary; ?>" /></td>
                                     </tr>
                                     <tr height="50">
                                         <td>Description : </td>
-                                        <td><input type="text" id="description" name="description" value="<?php echo $get_option_details['youtube']; ?>" /></td>
+                                        <td><input type="text" id="description" name="description" value="<?php echo $getDescription; ?>" /></td>
                                     </tr>
                                     <tr height="50">
                                         <td>Rating : </td>
-                                        <td><input type="text" id="rating" name="rating" value="<?php echo $get_option_details['linkedin']; ?>" /></td>
+                                        <td><input type="text" id="rating" name="rating" value="<?php echo $getRating; ?>" /></td>
                                     </tr> 
                                 </table>
                             </div>                         
                             <input class="button-primary" type="submit" value="Submit" name="submit" />    
                         </fieldset>
+                    </form>
+                </div>
+            </div>           
+        </div>
+    </div>
+    <?php
+}
+
+function wpsmanageDeleteRichSnippets() {
+    session_start();
+    global $wpdb;
+    $wpdb->delete($wpdb->prefix . "rich_snippets_review", array('id' => $_GET['review']));
+    if ($wpdb->rows_affected > 0) {
+        $_SESSION['area_status'] = 'deletesuccess';
+    } else {
+        $_SESSION['area_status'] = 'deletefailed';
+    }
+    if ($_GET['paged'] != '') {
+        wp_redirect(admin_url('admin.php?page=wps-rich-snippets-review&paged="' . $_GET['paged'] . '"'));
+        exit;
+    }
+    wp_redirect(admin_url('admin.php?page=wps-rich-snippets-review'));
+}
+
+function wpsmanageRichSnippets() {
+    session_start();
+    $my_plugin_tabs = array(
+        'wps-social-profile' => 'Your company',
+        'wps-manage-social-seo' => 'Social seo',
+        'wps-facebook-review' => 'Facebook review',
+        'wps-rich-snippets-review' => 'Rich snippets review',
+    );
+    echo admin_tabs($my_plugin_tabs);
+    ?>   
+    <div class="wrap">                
+    <!--<div class="alert-box warning"><span>warning: </span>Write your warning message here.</div>
+    <div class="alert-box notice"><span>notice: </span>Write your notice message here.</div>-->
+        <h2><?php _e('Rich snippets review', 'cqp'); ?> <a class="add-new-h2" href="<?php echo admin_url() ?>admin.php?page=wps-add-rich-snippets-review">Add New</a></h2>         
+        <div id="poststuff" class="metabox-holder ppw-settings">
+            <div class="postbox" id="ppw_global_postbox">                           
+                <div class="inside">
+                    <form id="review" name="review" method="post" action="">
+                        <?php
+                        if ($_REQUEST['action'] == 'delete') {
+                            $del = $_REQUEST['review'];
+                            if ($del != '') {
+                                $idsToDelete = implode($del, ',');
+                                global $wpdb;
+                                $wpdb->query($wpdb->prepare("DELETE FROM " . $wpdb->prefix . "rich_snippets_review WHERE id IN ($idsToDelete)"));
+                                if ($wpdb->rows_affected > 0) {
+                                    $_SESSION['area_status'] = 'deletesuccess';
+                                    wp_redirect(admin_url('admin.php?page=wps-rich-snippets-review&paged="' . $_GET['paged'] . '"'));
+                                    exit;
+                                }
+                            } else {
+                                $_SESSION['area_status'] = 'deletefailed';
+                                if ($_GET['paged'] != '') {
+                                    wp_redirect(admin_url('admin.php?page=wps-rich-snippets-review&paged="' . $_GET['paged'] . '"'));
+                                } else {
+                                    wp_redirect(admin_url('admin.php?page=wps-rich-snippets-review'));
+                                }
+                            }
+                        }
+                        $myListTable = new Wps_Review_List_Table();
+                        $myListTable->prepare_items();
+                        $myListTable->display();
+                        ?>
                     </form>
                 </div>
             </div>           
@@ -774,7 +868,7 @@ function display_rich_snippets() {
             border-radius: 5px;
             color: #000 !important;
             margin-bottom: 5px;
-/*            margin-top: 30px;*/
+            /*            margin-top: 30px;*/
             padding: 10px;
         }
         .bottom-class {
@@ -794,24 +888,24 @@ function display_rich_snippets() {
             border-radius:5px;
             padding: 10px;
         }
-        </style>
-        <script>
-             var ratingUrl="<?php echo plugins_url();?>/wp-social/";
-            </script>
-        <?php
-        session_start();
-        global $wpdb;
-        wp_enqueue_style('carouselcss', plugins_url('css/jquery.bxslider.css', __FILE__));
-         wp_enqueue_style('ratingcss', plugins_url('js/jRating.jquery.css', __FILE__));
-        wp_enqueue_script('jquery');
-        wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
-         wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
-        $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
-        //echo $wpdb->last_query;
-        $i = 0;
-        $display = '';
-        $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
-        $display .='<script>jQuery(document).ready(function () {           
+    </style>
+    <script>
+        var ratingUrl = "<?php echo plugins_url(); ?>/wp-social-seo/";
+    </script>
+    <?php
+    session_start();
+    global $wpdb;
+    wp_enqueue_style('carouselcss', plugins_url('css/jquery.bxslider.css', __FILE__));
+    wp_enqueue_style('ratingcss', plugins_url('js/jRating.jquery.css', __FILE__));
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
+    wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
+    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
+    //echo $wpdb->last_query;
+    $i = 0;
+    $display = '';
+    $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
+    $display .='<script>jQuery(document).ready(function () {           
         jQuery(\'.bxslider\').bxSlider({
         pager :false,
         auto:true,
@@ -826,8 +920,8 @@ function display_rich_snippets() {
 	});
         });</script>       
                     <ul class="bxslider">';
-        foreach ($Lists as $List) {
-            $display .='
+    foreach ($Lists as $List) {
+        $display .='
          <li>
             <div class="hms-testimonial-container" itemscope itemtype="http://data-vocabulary.org/Review">
                 <div class="testimonial">
@@ -842,10 +936,10 @@ function display_rich_snippets() {
                 </div>
             </div>
         </li>';
-        }
-        $display .=' </ul>';
-        echo $display;
-        ?>
-        <?php
     }
+    $display .=' </ul>';
+    echo $display;
     ?>
+    <?php
+}
+?>

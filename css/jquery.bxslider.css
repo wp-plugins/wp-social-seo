@@ -30,10 +30,13 @@
 ul.bxslider {
   list-style: none;
 }
+ul.bxslider li{
+    width:240px !important;
+}
 .bx-viewport {
   /*fix other elements on the page moving (on Chrome)*/
   -webkit-transform: translatez(0);
-  height:400px !important
+/*  height:400px !important*/
 }
 /** THEME
 ===================================*/
@@ -182,4 +185,11 @@ ul.bxslider {
   display: block;
   font-size: .85em;
   padding: 10px;
+}
+.bx-viewport{
+    height: 290px !important;
+}
+
+.sidebar-primary > .widget > .widget-wrap > .textwidget, .sidebar-secondary > .widget > .widget-wrap > .textwidget {
+    padding: 0px !important;
 }

@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.2
+ * Version: 2.1
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -30,14 +30,14 @@ function wps_admin_init() {
             `item_name` varchar(255) default NULL,
             `reviewer_name` varchar(255) default NULL,
             `date_reviewed` varchar(255) default NULL,
-            `summary` TEXT DEFAULT NULL,
-            `url` TEXT DEFAULT NULL,
+            `summary` TEXT DEFAULT NULL,            
             `description` TEXT DEFAULT NULL,
             `rating` int(10) NOT NULL,
             `status` int(10) DEFAULT 1,
             `dateCreated` timestamp NOT NULL,
             PRIMARY KEY (`id`))ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;";
     $wpdb->query($sql);
+    $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD url TEXT NOT NULL AFTER `description`");    
     add_menu_page(__('Structured Data', 'wps'), __('Structured Data', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
     //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
     add_submenu_page('', __('Social seo', 'wps'), __('Social seo', 'wps'), 'manage_options', 'wps-manage-social-seo', 'wpsmanageSocialSeo');
@@ -908,6 +908,7 @@ function display_rich_snippets() {
     wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
     wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
     $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
+    if(!empty($Lists)){
     //echo $wpdb->last_query;
     $i = 0;
     $display = '';
@@ -946,6 +947,9 @@ function display_rich_snippets() {
     }
     $display .=' </ul>';
     return $display;
+    } else{
+        return '';
+    }    
     ?>
     <?php
 }

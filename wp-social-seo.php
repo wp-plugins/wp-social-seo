@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 1.8
+ * Version: 1.9
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -31,6 +31,7 @@ function wps_admin_init() {
             `reviewer_name` varchar(255) default NULL,
             `date_reviewed` varchar(255) default NULL,
             `summary` TEXT DEFAULT NULL,
+            `url` TEXT DEFAULT NULL,
             `description` TEXT DEFAULT NULL,
             `rating` int(10) NOT NULL,
             `status` int(10) DEFAULT 1,
@@ -441,6 +442,7 @@ function wpsmanageAddRichSnippets() {
             $getDescription = $getDetails->description;
             $getStatus = $getDetails->status;
             $getRating = $getDetails->rating;
+            $getUrl = $getDetails->url;
         }
     }
     $my_plugin_tabs = array(
@@ -530,6 +532,10 @@ function wpsmanageAddRichSnippets() {
                                     <tr height="50">
                                         <td>Description : </td>
                                         <td><input type="text" id="description" name="description" value="<?php echo $getDescription; ?>" /></td>
+                                    </tr>
+                                    <tr height="50">
+                                        <td>URL : </td>
+                                        <td><input type="text" id="url" name="url" value="<?php echo $getUrl; ?>" /></td>
                                     </tr>
                                     <tr height="50">
                                         <td>Rating : </td>
@@ -625,6 +631,7 @@ function wpsSaveRichSnippets() {
         $insertArray['summary'] = $_POST['summary'];
         $insertArray['description'] = $_POST['description'];
         $insertArray['rating'] = $_POST['rating'];
+        $insertArray['url'] = $_POST['url'];
         if ($_POST['id'] != '') {
             $wpdb->update($wpdb->prefix . "rich_snippets_review", $insertArray, array('id' => $_POST['id']), array('%s', '%s'), array('%d'));
             //if ($wpdb->insert_id > 0) {
@@ -930,7 +937,7 @@ function display_rich_snippets() {
                         <div class="gnrl-class" itemprop="description">' . $List->description . '</div>
                     </div>
                     <div class="bottom-class">
-                        <div class="gnrl-new-class" itemprop="reviewer">Reviewed by <i>' . $List->reviewer_name . '</i> on <time itemprop="dtreviewed" datetime="' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
+                        <div class="gnrl-new-class" itemprop="reviewer">Reviewed by <i><a href="' . $List->url . '" target="_blank">' . $List->reviewer_name . '</a></i> on <time itemprop="dtreviewed" datetime="' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
                         <div class="gnrl-new-class" itemprop="rating"><div class="basic" data-average="' . $List->rating . '" data-id="1"></div></div>
                     </div>
                 </div>
@@ -938,7 +945,7 @@ function display_rich_snippets() {
         </li>';
     }
     $display .=' </ul>';
-    echo $display;
+    return $display;
     ?>
     <?php
 }

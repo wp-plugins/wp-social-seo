@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 2.1
+ * Version: 2.2
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -37,7 +37,7 @@ function wps_admin_init() {
             `dateCreated` timestamp NOT NULL,
             PRIMARY KEY (`id`))ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;";
     $wpdb->query($sql);
-    $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD url TEXT NOT NULL AFTER `description`");    
+    $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD url TEXT NOT NULL AFTER `description`");
     add_menu_page(__('Structured Data', 'wps'), __('Structured Data', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
     //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
     add_submenu_page('', __('Social seo', 'wps'), __('Social seo', 'wps'), 'manage_options', 'wps-manage-social-seo', 'wpsmanageSocialSeo');
@@ -908,12 +908,12 @@ function display_rich_snippets() {
     wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
     wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
     $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
-    if(!empty($Lists)){
-    //echo $wpdb->last_query;
-    $i = 0;
-    $display = '';
-    $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
-    $display .='<script>jQuery(document).ready(function () {           
+    if (!empty($Lists)) {
+        //echo $wpdb->last_query;
+        $i = 0;
+        $display = '';
+        $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
+        $display .='<script>jQuery(document).ready(function () {           
         jQuery(\'.bxslider\').bxSlider({
         pager :false,
         auto:true,
@@ -928,24 +928,24 @@ function display_rich_snippets() {
 	});
         });</script>       
                     <ul class="bxslider">';
-    foreach ($Lists as $List) {
+        foreach ($Lists as $List) {
         $display .='
-         <li>
-            <div class="hms-testimonial-container" itemscope itemtype="http://data-vocabulary.org/Review">
-                <div class="testimonial">
-                    <div class="top-class">                    
-                        <div class="gnrl-class" itemprop="itemreviewed">' . stripcslashes($List->item_name) . '</div>
-                        <div class="gnrl-class" itemprop="description">' . stripcslashes($List->description) . '</div>
-                    </div>
-                    <div class="bottom-class">
-                        <div class="gnrl-new-class" itemprop="reviewer">Reviewed by <i><a href="' . $List->url . '" target="_blank">' . stripcslashes($List->reviewer_name) . '</a></i> on <time itemprop="dtreviewed" datetime="' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
-                        <div class="gnrl-new-class" itemprop="rating"><div class="basic" data-average="' . $List->rating . '" data-id="1"></div></div>
-                    </div>
-                </div>
+            <li>
+            <div class = "hms-testimonial-container" itemscope itemtype = "http://data-vocabulary.org/Review">
+            <div class = "testimonial">
+            <div class = "top-class">
+            <div class = "gnrl-class" itemprop = "itemreviewed">' . stripcslashes($List->item_name) . '</div>
+            <div class = "gnrl-class" itemprop = "description">' . preg_replace('/\\\\/', '', $List->description) . '</div>
             </div>
-        </li>';
+            <div class = "bottom-class">
+            <div class = "gnrl-new-class" itemprop = "reviewer">Reviewed by <i><a href = "' . $List->url . '" target = "_blank">' . stripcslashes($List->reviewer_name) . '</a></i> on <time itemprop = "dtreviewed" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
+            <div class = "gnrl-new-class" itemprop = "rating"><div class = "basic" data-average = "' . $List->rating . '" data-id = "1"></div></div>
+            </div>
+            </div>
+            </div>
+            </li>';
     }
-    $display .=' </ul>';
+    $display .=' </ul > ';
     return $display;
     } else{
         return '';

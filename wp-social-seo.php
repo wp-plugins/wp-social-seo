@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 2.2
+ * Version: 2.3
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -14,6 +14,9 @@ error_reporting(0);
  */
 if (!class_exists('Wps_Review_List_Table')) {
     require_once( plugin_dir_path(__FILE__) . 'class/class-wps-review-list-table.php' );
+}
+if (!class_exists('NMRichReviewsAdminHelper')) {
+    require_once(plugin_dir_path(__FILE__) . 'class/admin-view-helper-functions.php');
 }
 add_action('admin_menu', 'wps_admin_init');
 add_action('admin_post_submit-wnp-settings', 'wpsSaveSettings');
@@ -56,6 +59,9 @@ function wps_load_custom_wp_admin_style() {
 add_action('admin_enqueue_scripts', 'wps_load_custom_wp_admin_style');
 
 function wpscallWebNicePlc() {
+    $pluginDirectory = trailingslashit(plugins_url(basename(dirname(__FILE__))));
+    wp_register_style('wp-social-css', $pluginDirectory . 'css/wp-social-seo.css');
+    wp_enqueue_style('wp-social-css');
     $get_option_details = unserialize(get_option('wnp_your_company'));
     $my_plugin_tabs = array(
         'wps-social-profile' => 'Your company',
@@ -68,12 +74,16 @@ function wpscallWebNicePlc() {
 
     <script>
         jQuery(document).ready(function () {
+            jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#companyID').ajaxForm({
                 beforeSubmit: wpsValidate,
                 success: function (data) {
                     jQuery('.success').show();
                 }
+            });
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+                return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
         function wpsValidate() {
@@ -107,10 +117,36 @@ function wpscallWebNicePlc() {
             return true;
         }
     </script>    
-    <div class="wrap">        
-        <h2><?php _e('Your company', 'wps'); ?></h2> 
+    <style>        
+        .wps-admin-page .content-container {
+            width: 100% !important;
+        }
+        .wps-admin-page .content-container-right {
+            width: 100% !important;
+        }
+        .left-side{
+            display:block;
+            float:left;            
+        }
+        .right-side{
+            display:block;
+            float:left;
+            width: 30%
+        }
+        #poststuff {
+            min-width: 763px;
+            padding-top: 10px;
+            width: 70%;
+        }
+    </style>
+    <div class="wrap">                    
         <div id="poststuff" class="metabox-holder ppw-settings">
-            <div class="postbox" id="ppw_global_postbox">               
+            <div class="left-side">
+                <?php
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('Company Information');
+                ?>
+                <!--            <div class="postbox" id="ppw_global_postbox">               -->
                 <div class="inside">                               
                     <form id="companyID" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
                         <fieldset>                            
@@ -133,7 +169,7 @@ function wpscallWebNicePlc() {
                                                 <option value="Organization" <?php echo $org; ?> >Organization</option>
                                                 <option value="Personal" <?php echo $personal; ?>>Personal</option>
                                             </select>
-                                            <span style="background: none repeat scroll 0 0 #99ff99;margin: 0 0 0 224px;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
+                                            <span style="background: none repeat scroll 0 0 #99ff99;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
                                         </td>
                                     </tr>     
                                     <tr height="50">
@@ -152,7 +188,7 @@ function wpscallWebNicePlc() {
                                         <td>Telephone : </td>
                                         <td><input type="text" class="validate[required] text-input" id="telephone" name="telephone" value="<?php echo $get_option_details['telephone']; ?>" /> </td>
                                     </tr>
-    <!--                                    <tr height="50">
+        <!--                                    <tr height="50">
                                         <td>Other telephone : </td>
                                         <td><input type="text" class="validate[required] text-input" id="other_telephone" name="other_telephone" value="<?php echo $get_option_details['other_telephone']; ?>" /> </td>
                                     </tr>-->
@@ -181,7 +217,7 @@ function wpscallWebNicePlc() {
                                             <span class="info_class">Countries may be specified concisely using just their standard ISO-3166 two-letter code, for example US, CA, MX</span>
                                         </td>
                                     </tr>
-    <!--                                    <tr height="50">
+        <!--                                    <tr height="50">
                                         <td>Contact option: </td>
                                         <td>
                                             <select class="validate[required] text-input" id="contact_option" name="contact_option[]" multiple="multiple">
@@ -212,11 +248,42 @@ function wpscallWebNicePlc() {
                             <input class="button-primary" type="submit" value="Submit" name="submit" />    
                         </fieldset>
                     </form>
-                </div>
-            </div>           
+                </div>               
+                <!--            </div>   -->
+                <?php
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                ?>
+                <?php
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('About');
+                render_rr_show_content();
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                ?>
+            </div>            
+        </div>    
+        <div class="right-side">
+            <?php
+            NMRichReviewsAdminHelper::render_container_open('content-container-right');
+            NMRichReviewsAdminHelper::render_postbox_open('Need Help');
+            render_rr_show_content();
+            NMRichReviewsAdminHelper::render_postbox_close();
+            NMRichReviewsAdminHelper::render_container_close();
+             NMRichReviewsAdminHelper::render_container_open('content-container-right');
+            NMRichReviewsAdminHelper::render_postbox_open('Review Us');
+            render_rr_show_content();
+            NMRichReviewsAdminHelper::render_postbox_close();
+            NMRichReviewsAdminHelper::render_container_close();
+            ?>
         </div>
     </div>
     <?php
+}
+
+function render_rr_show_content() {
+    $output = 'Content will be updated soon';
+    echo $output;
 }
 
 function wpsmanageSocialSeo() {
@@ -929,7 +996,7 @@ function display_rich_snippets() {
         });</script>       
                     <ul class="bxslider">';
         foreach ($Lists as $List) {
-        $display .='
+            $display .='
             <li>
             <div class = "hms-testimonial-container" itemscope itemtype = "http://data-vocabulary.org/Review">
             <div class = "testimonial">
@@ -944,12 +1011,12 @@ function display_rich_snippets() {
             </div>
             </div>
             </li>';
-    }
-    $display .=' </ul > ';
-    return $display;
-    } else{
+        }
+        $display .=' </ul > ';
+        return $display;
+    } else {
         return '';
-    }    
+    }
     ?>
     <?php
 }

@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 2.7
+ * Version: 2.8
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -300,8 +300,7 @@ function wpsmanageSocialSeo() {
                                 <table cellpadding="0" cellspacing="0" border="0" width="600" class="form-table">                                    
                                     <tr height="50">
                                         <td>Facebook : </td>
-                                        <td><input type="text" class="validate[required] text-input" id="facebook" name="facebook" value="<?php echo $get_option_details['facebook']; ?>" />
-                                            <span style="background: none repeat scroll 0 0 #99ff99;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
+                                        <td><input type="text" class="validate[required] text-input" id="facebook" name="facebook" value="<?php echo $get_option_details['facebook']; ?>" />                                            
                                         </td>
                                     </tr>
                                     <tr height="50">

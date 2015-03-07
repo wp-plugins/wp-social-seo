@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 2.6
+ * Version: 2.7
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -116,31 +116,7 @@ function wpscallWebNicePlc() {
             }
             return true;
         }
-    </script>    
-    <style>        
-        .wps-admin-page .content-container {
-            width: 100% !important;
-        }
-        .wps-admin-page .content-container-right {
-            width: 100% !important;
-            display: block;
-            float: left;
-        }
-        .left-side{
-            display:block;
-            float:left;            
-        }
-        .right-side{
-            display:block;
-            float:left;
-            width: 30%
-        }
-        #poststuff {
-            min-width: 763px;
-            padding-top: 10px;
-            width: 70%;
-        }
-    </style>
+    </script>        
     <div class="wrap">                    
         <div id="poststuff" class="metabox-holder ppw-settings">
             <div class="left-side">
@@ -170,8 +146,7 @@ function wpscallWebNicePlc() {
                                                 ?>
                                                 <option value="Organization" <?php echo $org; ?> >Organization</option>
                                                 <option value="Personal" <?php echo $personal; ?>>Personal</option>
-                                            </select>
-                                            <span style="background: none repeat scroll 0 0 #99ff99;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
+                                            </select>                                            
                                         </td>
                                     </tr>     
                                     <tr height="50">
@@ -215,8 +190,7 @@ function wpscallWebNicePlc() {
                                     </tr>
                                     <tr height="50">
                                         <td>Area served : </td>
-                                        <td><input type="text" class="text-input" id="area_served" name="area_served" value="<?php echo $get_option_details['area_served']; ?>" />
-                                            <span class="info_class">Countries may be specified concisely using just their standard ISO-3166 two-letter code, for example US, CA, MX</span>
+                                        <td><input type="text" class="text-input" id="area_served" name="area_served" value="<?php echo $get_option_details['area_served']; ?>" />                                          
                                         </td>
                                     </tr>
         <!--                                    <tr height="50">
@@ -241,8 +215,7 @@ function wpscallWebNicePlc() {
                                     <tr height="50">
                                         <td>Available language : </td>
                                         <td>
-                                            <input type="text" id="avail_language" name="avail_language" value="<?php echo $get_option_details['avail_language']; ?>" />
-                                            <span class="info_class">Optional details about the language spoken. Languages may be specified by their common English name. If omitted, the language defaults to English, for example French, English</span>
+                                            <input type="text" id="avail_language" name="avail_language" value="<?php echo $get_option_details['avail_language']; ?>" />                                            
                                         </td>
                                     </tr>                                                                        
                                 </table>
@@ -265,30 +238,25 @@ function wpscallWebNicePlc() {
                 ?>
             </div>            
         </div>    
-        <div class="right-side">
-            <?php
-            NMRichReviewsAdminHelper::render_container_open('content-container-right');
-            NMRichReviewsAdminHelper::render_postbox_open('Need Help');
-            render_rr_show_content();
-            NMRichReviewsAdminHelper::render_postbox_close();
-            NMRichReviewsAdminHelper::render_container_close();
-            NMRichReviewsAdminHelper::render_container_open('content-container-right');
-            NMRichReviewsAdminHelper::render_postbox_open('Review Us');
-            render_rr_show_content();
-            NMRichReviewsAdminHelper::render_postbox_close();
-            NMRichReviewsAdminHelper::render_container_close();
-            ?>
-        </div>
+        <?php displayRight(); ?>
     </div>
     <?php
 }
 
 function render_rr_show_content() {
-    $output = 'Content will be updated soon';
+    $output = '<p><strong>WP Social SEO</strong> gives you the ability to quick add your Social Profiles in a compliant way so that it shows up in a google search.</p>
+               <p>Specify your social profiles to Googlehttps://developers.google.com/webmasters/structured-data/customize/social-profiles</p>
+               <p>Use mark-up on your official website to add your social profile information to the Google Knowledge panel in some searches. Knowledge panels can prominently display your social profile information.</p>
+               <p>Our other free plugins can be found at https://profiles.wordpress.org/pigeonhut/</p>
+               <p>To see more about us as a company, visit http://www.web9.co.uk</p>
+               <p>Proudly made in Belfast, Northern Ireland.</p>';
     echo $output;
 }
 
 function wpsmanageSocialSeo() {
+    $pluginDirectory = trailingslashit(plugins_url(basename(dirname(__FILE__))));
+    wp_register_style('wp-social-css', $pluginDirectory . 'css/wp-social-seo.css');
+    wp_enqueue_style('wp-social-css');
     $get_option_details = unserialize(get_option('wnp_social_settings'));
     $my_plugin_tabs = array(
         'wps-social-profile' => 'Your company',
@@ -297,21 +265,30 @@ function wpsmanageSocialSeo() {
         'wps-rich-snippets-review' => 'Rich snippets review',
     );
     echo admin_tabs($my_plugin_tabs);
-    ?>
+    ?>    
     <script>
         jQuery(document).ready(function () {
+            jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#settingsID').ajaxForm({
                 success: function (data) {
                     jQuery('.success').show();
                 }
             });
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+                return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
+            });
         });
     </script>    
     <div class="wrap">        
         <h2><?php _e('Wp Social profile settings', 'wnp'); ?></h2> 
         <div id="poststuff" class="metabox-holder ppw-settings">
-            <div class="postbox" id="ppw_global_postbox">               
+            <div class="left-side">
+                <?php
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('Social Seo');
+                ?>
+                <!--                <div class="postbox" id="ppw_global_postbox">               -->
                 <div class="inside">                               
                     <form id="settingsID" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
                         <fieldset>                            
@@ -324,7 +301,7 @@ function wpsmanageSocialSeo() {
                                     <tr height="50">
                                         <td>Facebook : </td>
                                         <td><input type="text" class="validate[required] text-input" id="facebook" name="facebook" value="<?php echo $get_option_details['facebook']; ?>" />
-                                            <span style="background: none repeat scroll 0 0 #99ff99;margin: 0 0 0 224px;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
+                                            <span style="background: none repeat scroll 0 0 #99ff99;padding: 10px;">You can test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google's Structured Data Testing Tool </a></span>
                                         </td>
                                     </tr>
                                     <tr height="50">
@@ -358,14 +335,28 @@ function wpsmanageSocialSeo() {
                         </fieldset>
                     </form>
                 </div>
-            </div>           
+                <!--                </div> -->
+                <?php
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('About');
+                render_rr_show_content();
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                ?>
+            </div>
         </div>
+        <?php displayRight(); ?>
     </div>
 
     <?php
 }
 
 function wpsmanageFacebookReview() {
+    $pluginDirectory = trailingslashit(plugins_url(basename(dirname(__FILE__))));
+    wp_register_style('wp-social-css', $pluginDirectory . 'css/wp-social-seo.css');
+    wp_enqueue_style('wp-social-css');
     $get_option_details = unserialize(get_option('wnp_facebook_reviews'));
     $otpr = '';
     $i = 1;
@@ -390,11 +381,15 @@ function wpsmanageFacebookReview() {
     ?>
     <script>
         jQuery(document).ready(function () {
+            jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#facebookReview').ajaxForm({
                 success: function (data) {
                     jQuery('.success').show();
                 }
+            });
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+                return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
             jQuery('#btnAdd').click(function () {
                 var num = jQuery('.clonedInput').length, // Checks to see how many "duplicatable" input fields we currently have
@@ -447,7 +442,12 @@ function wpsmanageFacebookReview() {
     <div class="wrap">        
         <h2><?php _e('Facebook Reviews', 'wnp'); ?></h2> 
         <div id="poststuff" class="metabox-holder ppw-settings">
-            <div class="postbox" id="ppw_global_postbox">               
+            <div class="left-side">
+                <?php
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('Facebook Reviews');
+                ?>
+                <!--            <div class="postbox" id="ppw_global_postbox">               -->
                 <div class="inside">                               
                     <form id="facebookReview" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
                         <fieldset>                            
@@ -484,14 +484,29 @@ function wpsmanageFacebookReview() {
                         </fieldset>
                     </form>
                 </div>
-            </div>           
+                <?php
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('About');
+                render_rr_show_content();
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                ?>
+                <!--            </div>           -->
+            </div>
         </div>
+        <?php displayRight(); ?>
     </div>
+
     <?php
 }
 
 function wpsmanageAddRichSnippets() {
     session_start();
+    $pluginDirectory = trailingslashit(plugins_url(basename(dirname(__FILE__))));
+    wp_register_style('wp-social-css', $pluginDirectory . 'css/wp-social-seo.css');
+    wp_enqueue_style('wp-social-css');
     global $wpdb;
     if ($_REQUEST['action'] == 'edit' && $_REQUEST['review'] != '') {
         $getItemname = '';
@@ -524,12 +539,16 @@ function wpsmanageAddRichSnippets() {
     ?>
     <script>
         jQuery(document).ready(function () {
+            jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#reviewID').ajaxForm({
                 beforeSubmit: wpsValidate,
                 success: function (data) {
                     jQuery('.success').show();
                 }
+            });
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+                return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
         function wpsValidate() {
@@ -571,7 +590,12 @@ function wpsmanageAddRichSnippets() {
     <div class="wrap">        
         <h2><?php _e('Rich snippets review', 'wnp'); ?></h2> 
         <div id="poststuff" class="metabox-holder ppw-settings">
-            <div class="postbox" id="ppw_global_postbox">               
+            <div class="left-side">
+                <?php
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('Facebook Reviews');
+                ?>
+                <!--            <div class="postbox" id="ppw_global_postbox">               -->
                 <div class="inside">                               
                     <form id="reviewID" method="post" action="<?php echo get_admin_url() ?>admin-post.php">  
                         <fieldset>                            
@@ -616,8 +640,19 @@ function wpsmanageAddRichSnippets() {
                         </fieldset>
                     </form>
                 </div>
-            </div>           
+                <!--            </div>           -->
+                <?php
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('About');
+                render_rr_show_content();
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                ?>
+            </div>
         </div>
+        <?php displayRight(); ?>
     </div>
     <?php
 }
@@ -639,6 +674,9 @@ function wpsmanageDeleteRichSnippets() {
 }
 
 function wpsmanageRichSnippets() {
+    $pluginDirectory = trailingslashit(plugins_url(basename(dirname(__FILE__))));
+    wp_register_style('wp-social-css', $pluginDirectory . 'css/wp-social-seo.css');
+    wp_enqueue_style('wp-social-css');
     session_start();
     $my_plugin_tabs = array(
         'wps-social-profile' => 'Your company',
@@ -648,12 +686,25 @@ function wpsmanageRichSnippets() {
     );
     echo admin_tabs($my_plugin_tabs);
     ?>   
+    <script>
+        jQuery(document).ready(function () {
+            jQuery("body").addClass("wps-admin-page")
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+                return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
+            });
+        });
+    </script>  
     <div class="wrap">                
     <!--<div class="alert-box warning"><span>warning: </span>Write your warning message here.</div>
     <div class="alert-box notice"><span>notice: </span>Write your notice message here.</div>-->
         <h2><?php _e('Rich snippets review', 'cqp'); ?> <a class="add-new-h2" href="<?php echo admin_url() ?>admin.php?page=wps-add-rich-snippets-review">Add New</a></h2>         
         <div id="poststuff" class="metabox-holder ppw-settings">
-            <div class="postbox" id="ppw_global_postbox">                           
+            <div class="left-side">
+                <?php
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('Facebook Reviews');
+                ?>
+                <!--            <div class="postbox" id="ppw_global_postbox">                           -->
                 <div class="inside">
                     <form id="review" name="review" method="post" action="">
                         <?php
@@ -683,8 +734,19 @@ function wpsmanageRichSnippets() {
                         ?>
                     </form>
                 </div>
+                <!--            </div>           -->
+                <?php
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('About');
+                render_rr_show_content();
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                ?>
             </div>           
         </div>
+        <?php displayRight(); ?>
     </div>
     <?php
 }
@@ -1021,5 +1083,37 @@ function display_rich_snippets() {
     }
     ?>
     <?php
+}
+
+function displayRight() {
+    ?>
+    <div class="right-side">
+        <?php
+        NMRichReviewsAdminHelper::render_container_open('content-container-right');
+        NMRichReviewsAdminHelper::render_postbox_open('Information');
+        render_rr_information();
+        NMRichReviewsAdminHelper::render_postbox_close();
+        NMRichReviewsAdminHelper::render_container_close();
+        NMRichReviewsAdminHelper::render_container_open('content-container-right');
+        NMRichReviewsAdminHelper::render_postbox_open('What we Do');
+        render_rr_what_we_do();
+        NMRichReviewsAdminHelper::render_postbox_close();
+        NMRichReviewsAdminHelper::render_container_close();
+        ?>
+    </div>
+    <?php
+}
+
+function render_rr_information() {
+    $output = '<span style="background: none repeat scroll 0 0 #99ff99;display:block;padding: 10px;">Test your Data using <a target="_blank" href="https://developers.google.com/webmasters/structured-data/testing-tool/">Google\'s Structured Data Testing Tool </a></span></br>';
+    $output .= '<span class="info_class">Countries may be specified concisely using just their standard ISO-3166 two-letter code, for example US, CA, MX</span></br></br>';
+    $output .='<span class="info_class">Optional details about the language spoken. Languages may be specified by their common English name. If omitted, the language defaults to English, for example French, English</span>';
+    echo $output;
+}
+
+function render_rr_what_we_do() {
+    $output = '<a href="http://www.web9.co.uk/our-plugins/" target="_blank"><img src="http://www.web9.co.uk/wp-content/uploads/2014/12/web9.png" width="401px" height="80px" /></a>';
+    $output .='<span style="background: none repeat scroll 0 0 #FFA500;display:block;padding: 10px; color:#fff;">Want to see how else we can help your business, we have a range of <a href="http://www.web9.co.uk/our-plugins/" target="_blank">free plugins</a> in the WordPress repository as we believe that by giving back to the community we help to create a better product for everyone to use.</span>';
+    echo $output;
 }
 ?>

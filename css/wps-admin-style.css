@@ -1,8 +1,6 @@
 .info_class{
-    background: none repeat scroll 0 0 #82CAFA;
-    margin: 0px 0px 0px 10px;
-    display: inline-block; 
-    width:450px;
+    background: none repeat scroll 0 0 #82CAFA;    
+    display: inline-block;    
     padding:10px;
 }        
 .wp-admin select {

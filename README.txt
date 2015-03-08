@@ -1,7 +1,7 @@
 === WP Social SEO ===
 Contributors: pigeonhut
 Donate link: 
-Tags: Social Schema, Social marketing, google schema. Google Structured Data
+Tags: Social Schema, Social marketing, google schema, Google Structured Data, Facebook Widget, sidebar, social, testimonials, widget, Google Structured Markup, Meta Markup, Structured Data
 Requires at least: 3.0
 Tested up to: 4.1
 Stable tag: 1.1.5
@@ -33,6 +33,12 @@ Our other free plugins can be found at https://profiles.wordpress.org/pigeonhut/
 To see more about us as a company, visit www.web9.co.uk
 
 Proudly made in Belfast, Northern Ireland.
+
+Single plugin for social media - With Social SEO, you can now also display Twitter, Facebook, custom text and a testimonial & custom images, all from the same widget.
+
+This is great for SEO, as it adds a lot of unique, random high quality text on a per page basis --> quality content, that Search Engines love, without creating 4 different widget areas. Everything is contained within that one widget.
+
+One widget, means faster page loads compared to having 3 or 4 different widgets loading on the same page.
 
 
 == Installation ==

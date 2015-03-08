@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 2.9
+ * Version: 3.0
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -1200,7 +1200,7 @@ function render_rr_information_facebook_reviews() {
 }
 
 function render_rr_information_rich_snippets() {
-    $output = '<span style="background: none repeat scroll 0 0 #99ff99;display:block;padding: 10px;">In a Widget, please use the following shortcode <strong>[wps-rich-snippets-review]</strong> to display your FB reviews on your site.</span></br>';
+    $output = '<span style="background: none repeat scroll 0 0 #99ff99;display:block;padding: 10px;">In a Widget, please use the following shortcode <strong>[wps-rich-snippets-review]</strong> to display your reviews on your site.</span></br>';
     $output .= '<span class="info_class"><a href="https://developers.google.com/structured-data/rich-snippets/" target="_blank">Google’s Rich Snippets</a> allow your visitors to add reviews to your website that will show up in the SERPs.  For more info, visit the Google page.</span></br></br>';
     echo $output;
 }

@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 3.02
+ * Version: 3.03
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -18,13 +18,26 @@ if (!class_exists('Wps_Review_List_Table')) {
 if (!class_exists('NMRichReviewsAdminHelper')) {
     require_once(plugin_dir_path(__FILE__) . 'class/admin-view-helper-functions.php');
 }
+if (!class_exists('reviews')) {
+    require_once( plugin_dir_path(__FILE__) . 'class/class-reviews.php' );
+}
+add_action('widgets_init', 'wps_load_widget');
+
 add_action('admin_menu', 'wps_admin_init');
 add_action('admin_post_submit-wnp-settings', 'wpsSaveSettings');
 add_action('admin_post_submit-wps-company', 'wpsSaveCompany');
 add_action('admin_post_submit-facebook-review', 'wpsFacebookReview');
 add_action('admin_post_submit-rich-snippets-review', 'wpsSaveRichSnippets');
+add_action('admin_post_submit-color-picker', 'saveSocialSeoColorPicker');
+
 add_shortcode('facebook-review-slider', 'bartag_func');
 add_shortcode('wps-rich-snippets', 'display_rich_snippets');
+add_shortcode('wps-rich-snippets-all', 'display_all_rich_snippets');
+
+function wps_load_widget(){
+    register_widget('reviews');
+}
+
 
 function wps_admin_init() {
     global $wpdb;
@@ -56,6 +69,9 @@ function wps_load_custom_wp_admin_style() {
     wp_enqueue_style('wpsadminstyle', plugins_url('css/wps-admin-style.css', __FILE__));
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-form');
+    wp_register_style('colorpickcss', plugins_url('css/colpick.css', __FILE__), array(), '20120208', 'all');
+    wp_enqueue_script('colorpickjs', plugins_url('js/colpick.js', __FILE__), array(), '1.0.0', true);
+    wp_enqueue_style('colorpickcss');
 }
 
 add_action('admin_enqueue_scripts', 'wps_load_custom_wp_admin_style');
@@ -77,16 +93,16 @@ function wpscallWebNicePlc() {
     ?>
 
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#companyID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function (data) {
+                success: function(data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -273,15 +289,15 @@ function wpsmanageSocialSeo() {
     echo admin_tabs($my_plugin_tabs);
     ?>    
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#settingsID').ajaxForm({
-                success: function (data) {
+                success: function(data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -387,18 +403,18 @@ function wpsmanageFacebookReview() {
     echo admin_tabs($my_plugin_tabs);
     ?>
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#facebookReview').ajaxForm({
-                success: function (data) {
+                success: function(data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
-            jQuery('#btnAdd').click(function () {
+            jQuery('#btnAdd').click(function() {
                 var num = jQuery('.clonedInput').length, // Checks to see how many "duplicatable" input fields we currently have
                         newNum = new Number(num + 1), // The numeric ID of the new input field being added, increasing by 1 each time
                         newElem = jQuery('#entry' + num).clone().attr('id', 'entry' + newNum).fadeIn('fast'); // create the new element via clone(), and manipulate it's ID using newNum value
@@ -421,13 +437,13 @@ function wpsmanageFacebookReview() {
                 //if (newNum == 5)
                 //jQuery('#btnAdd').attr('disabled', true).prop('value', "You've reached the limit"); // value here updates the text in the 'add' button when the limit is reached 
             });
-            jQuery('#btnDel').click(function () {
+            jQuery('#btnDel').click(function() {
                 // Confirmation dialog box. Works on all desktop browsers and iPhone.
                 //                if (confirm("Are you sure you wish to remove this section? This cannot be undone."))
                 //                {
                 var num = jQuery('.clonedInput').length;
                 // how many "duplicatable" input fields we currently have
-                jQuery('#entry' + num).slideUp('fast', function () {
+                jQuery('#entry' + num).slideUp('fast', function() {
                     jQuery(this).remove();
                     // if only one element remains, disable the "remove" button
                     if (num - 1 === 1)
@@ -547,16 +563,16 @@ function wpsmanageAddRichSnippets() {
     echo admin_tabs($my_plugin_tabs);
     ?>
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#reviewID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function (data) {
+                success: function(data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -565,12 +581,12 @@ function wpsmanageAddRichSnippets() {
             var reviewerValue = jQuery('input[name=reviewer-name]').fieldValue();
             var dateValue = jQuery('input[name=date-reviewed]').fieldValue();
             var summary = jQuery('input[name=summary]').fieldValue();
-            var descriptionValue = jQuery('input[name=description]').fieldValue();
-            var ratingValue = jQuery('input[name=rating]').fieldValue();
+            var descriptionValue = jQuery('textarea[name=description]').fieldValue();
+            var ratingValue = jQuery('select[name=rating]').fieldValue();
             // usernameValue and passwordValue are arrays but we can do simple
             // "not" tests to see if the arrays are empty
             if (!itemValue[0]) {
-                alert('Please enter a item name');
+                alert('Please enter a title in review of field');
                 return false;
             }
             if (!reviewerValue[0]) {
@@ -581,10 +597,10 @@ function wpsmanageAddRichSnippets() {
                 alert('Please enter date');
                 return false;
             }
-            if (!summary[0]) {
-                alert('Please enter summary');
-                return false;
-            }
+    //            if (!summary[0]) {
+    //                alert('Please enter summary');
+    //                return false;
+    //            }
             if (!descriptionValue[0]) {
                 alert('Please enter description');
                 return false;
@@ -615,7 +631,7 @@ function wpsmanageAddRichSnippets() {
                                 <div class="alert-box success" style="display:none;"><span>Success : </span>Your review has been added</div>
                                 <table cellpadding="0" cellspacing="0" border="0" width="600" class="form-table">                                    
                                     <tr height="50">
-                                        <td>Item name : </td>
+                                        <td>Review of : </td>
                                         <td><input type="text" class="validate[required] text-input" id="item-name" name="item-name" value="<?php echo $getItemname; ?>" />                                           
                                         </td>
                                     </tr>
@@ -627,13 +643,13 @@ function wpsmanageAddRichSnippets() {
                                         <td>Date reviewed : </td>
                                         <td><input type="text"  id="date-reviewed" name="date-reviewed" value="<?php echo $getDate; ?>" /></td>
                                     </tr>
-                                    <tr height="50">
+    <!--                                    <tr height="50">
                                         <td>Summary : </td>
                                         <td><input type="text" id="summary" name="summary" value="<?php echo $getSummary; ?>" /></td>
-                                    </tr>
+                                    </tr>-->
                                     <tr height="50">
                                         <td>Description : </td>
-                                        <td><input type="text" id="description" name="description" value="<?php echo $getDescription; ?>" /></td>
+                                        <td><textarea type="text" id="description" name="description"><?php echo $getDescription; ?></textarea></td>
                                     </tr>
                                     <tr height="50">
                                         <td>URL : </td>
@@ -641,7 +657,18 @@ function wpsmanageAddRichSnippets() {
                                     </tr>
                                     <tr height="50">
                                         <td>Rating : </td>
-                                        <td><input type="text" id="rating" name="rating" value="<?php echo $getRating; ?>" /></td>
+                                        <td>
+    <!--                                            <input type="text" id="rating" name="rating" value="<?php echo $getRating; ?>" />-->
+                                            <select id="rating" name="rating"> 
+                                                <option value=''>Select rating</option>
+                                                <option value='1'>1</option>
+                                                <option value='2'>2</option>
+                                                <option value='3'>3</option>
+                                                <option value='4'>4</option>
+                                                <option value='5'>5</option>
+                                            </select>
+                                        </td>
+
                                     </tr> 
                                 </table>
                             </div>                         
@@ -698,9 +725,9 @@ function wpsmanageRichSnippets() {
     echo admin_tabs($my_plugin_tabs);
     ?>   
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             jQuery("body").addClass("wps-admin-page")
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -1000,6 +1027,21 @@ function bartag_func($atts) {
 }
 
 function display_rich_snippets() {
+    session_start();
+    global $wpdb;
+    $get_option_details = unserialize(get_option('social_seo_options_picker'));
+    if (!empty($get_option_details)) {
+        if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
+            $picker1 = $get_option_details['picker1'];
+        if (isset($get_option_details['picker2']) && $get_option_details['picker2'] != '')
+            $picker2 = $get_option_details['picker2'];
+        if (isset($get_option_details['picker3']) && $get_option_details['picker3'] != '')
+            $picker3 = $get_option_details['picker3'];
+    } else {
+        $picker1 = '#CCCCCC';
+        $picker2 = '#FFF000';
+        $picker3 = '#FFFFFF';
+    }
     ?>
     <style>       
         .gnrl-class{
@@ -1013,15 +1055,16 @@ function display_rich_snippets() {
             float:right;
         }
         .top-class{
-            background: none repeat scroll 0 0 #fff000;
+            background: none repeat scroll 0 0 <?php echo $picker2; ?>;
             border-radius: 5px;
             color: #000 !important;
             margin-bottom: 5px;
             /*            margin-top: 30px;*/
             padding: 10px;
+            height: 100px;
         }
         .bottom-class {
-            background: none repeat scroll 0 0 #fff;
+            background: none repeat scroll 0 0 <?php echo $picker3; ?>;
             border-radius: 5px;
             color: #000;
             display: inline-block;
@@ -1032,18 +1075,17 @@ function display_rich_snippets() {
             text-align: right;
         }
         .testimonial{
-            background: none repeat scroll 0 0 #ccc;
+            background: none repeat scroll 0 0 <?php echo $picker1; ?>;
             display:inline-block;
             border-radius:5px;
             padding: 10px;
+            width: 100%;
         }
     </style>
     <script>
         var ratingUrl = "<?php echo plugins_url(); ?>/wp-social-seo/";
     </script>
     <?php
-    session_start();
-    global $wpdb;
     wp_enqueue_style('carouselcss', plugins_url('css/jquery.bxslider.css', __FILE__));
     wp_enqueue_style('ratingcss', plugins_url('js/jRating.jquery.css', __FILE__));
     wp_enqueue_script('jquery');
@@ -1077,7 +1119,7 @@ function display_rich_snippets() {
             <div class = "testimonial">
             <div class = "top-class">
             <div class = "gnrl-class" itemprop = "itemreviewed">' . stripcslashes($List->item_name) . '</div>
-            <div class = "gnrl-class" itemprop = "description">' . preg_replace('/\\\\/', '', $List->description) . '</div>
+            <div class = "gnrl-class" itemprop = "description">' . preg_replace('/\\\\/', '', substr($List->description, 0, 100)) . '</div>
             </div>
             <div class = "bottom-class">
             <div class = "gnrl-new-class" itemprop = "reviewer">Reviewed by <i><a href = "' . $List->url . '" target = "_blank">' . stripcslashes($List->reviewer_name) . '</a></i> on <time itemprop = "dtreviewed" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
@@ -1162,6 +1204,13 @@ function displayRightRichSnippets() {
         render_rr_information_rich_snippets();
         NMRichReviewsAdminHelper::render_postbox_close();
         NMRichReviewsAdminHelper::render_container_close();
+
+        NMRichReviewsAdminHelper::render_container_open('content-container-right');
+        NMRichReviewsAdminHelper::render_postbox_open('Color picker settings');
+        render_rr_color_picker_settings();
+        NMRichReviewsAdminHelper::render_postbox_close();
+        NMRichReviewsAdminHelper::render_container_close();
+
         NMRichReviewsAdminHelper::render_container_open('content-container-right');
         NMRichReviewsAdminHelper::render_postbox_open('What we Do');
         render_rr_what_we_do();
@@ -1200,8 +1249,90 @@ function render_rr_information_facebook_reviews() {
 }
 
 function render_rr_information_rich_snippets() {
-    $output = '<span style="background: none repeat scroll 0 0 #99ff99;display:block;padding: 10px;">In a Widget, please use the following shortcode <strong>[wps-rich-snippets-review]</strong> to display your reviews on your site.</span></br>';
+    $output = '<span style="background: none repeat scroll 0 0 #99ff99;display:block;padding: 10px;">In a Widget, please use the following shortcode <strong>[wps-rich-snippets]</strong> to display your reviews on your site.</span></br>';
     $output .= '<span class="info_class"><a href="https://developers.google.com/structured-data/rich-snippets/" target="_blank">Google’s Rich Snippets</a> allow your visitors to add reviews to your website that will show up in the SERPs.  For more info, visit the Google page.</span></br></br>';
+    echo $output;
+}
+
+function render_rr_color_picker_settings() {
+    session_start();
+    global $wpdb;
+    $picker1 = '';
+    $picker2 = '';
+    $picker3 = '';
+    $picker4 = '';
+    $call_back_admin_email = '';
+    $get_option_details = unserialize(get_option('social_seo_options_picker'));
+    if (!empty($get_option_details)) {
+        if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
+            $picker1 = $get_option_details['picker1'];
+        if (isset($get_option_details['picker2']) && $get_option_details['picker2'] != '')
+            $picker2 = $get_option_details['picker2'];
+        if (isset($get_option_details['picker3']) && $get_option_details['picker3'] != '')
+            $picker3 = $get_option_details['picker3'];
+    } else {
+        $picker1 = '#CCCCCC';
+        $picker2 = '#FFF000';
+        $picker3 = '#FFFFFF';
+    }
+    _socialStatusMessage('Color picker settings');
+    if ($dropdown == 1) {
+        $checked = 'checked="checked"';
+    } else {
+        $checked = '';
+    }
+    $output = '   <div class="info_class"> 
+                    <form id="color_picker_form" name="color_picker_form" method="post" action="' . get_admin_url() . 'admin-post.php" onsubmit="return validate();">  
+                        <fieldset>
+                            <input type=\'hidden\' name=\'action\' value=\'submit-color-picker\' />
+                            <table width="600px" cellpadding="0" cellspacing="0" class="form-table">
+                                <tr>
+                                    <td>Total background color : </td>
+                                    <td><input readonly type="text" id="picker1" name="picker1" style="border-color:' . $picker1 . '" value="' . $picker1 . '"></input></td>
+                                </tr>
+                                <tr>
+                                    <td>Top background color : </td>
+                                    <td><input readonly type="text" id="picker2" name="picker2" style="border-color:' . $picker2 . '" value="' . $picker2 . '"></input></td>
+                                </tr>
+                                <tr>
+                                    <td>Bottom background color : </td>
+                                    <td><input readonly type="text" id="picker3" name="picker3" style="border-color:' . $picker3 . '" value="' . $picker3 . '"></input></td>
+                                </tr>                                                                                                                 
+                                <tr>                                
+                                    <td colspan="2"><input class="button-primary" type="submit" id="submit_form_settings" name="submit_form_settings"></input></td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </form>   </div>             
+    <script>
+        function validate() {
+            var picker1 = jQuery(\'#picker1\').val();
+            var picker2 = jQuery(\'#picker2\').val();
+            var picker3 = jQuery(\'#picker3\').val();          
+            var call_back_admin_email = jQuery(\'#call_back_admin_email\').val();
+            if (picker1 == \'\' || picker2 == \'\' || picker3 == \'\') {
+                alert(\'Please fill all the required fields\');
+                return false;
+            }
+            return true;
+        }
+        jQuery(document).ready(function () {
+            jQuery(\'#picker1,#picker2,#picker3\').colpick({
+                layout: \'hex\',
+                submit: 0,
+                color: \'3289c7\',
+                colorScheme: \'dark\',
+                onChange: function (hsb, hex, rgb, el, bySetColor) {
+                    jQuery(el).css(\'border-color\', \'#\' + hex);
+                    // Fill the text box just if the color was set using the picker, and not the colpickSetColor function.
+                    if (!bySetColor)
+                        jQuery(el).val(\'#\' + hex);
+                }
+            }).keyup(function () {
+                jQuery(this).colpickSetColor(this.value);
+            });
+        });
+    </script>';
     echo $output;
 }
 
@@ -1223,19 +1354,19 @@ function wpsFeeds() {
     ?>
 
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#companyID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function (data) {
+                success: function(data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
-       });
+        });
     </script>        
     <div class="wrap">                    
         <div id="poststuff" class="metabox-holder ppw-settings">
@@ -1246,7 +1377,7 @@ function wpsFeeds() {
                 ?>
                 <!--            <div class="postbox" id="ppw_global_postbox">               -->
                 Coming soon <br/>
-                    Embed Facebook & Twitter Social Feeds in your page or sidebar as a widget
+                Embed Facebook & Twitter Social Feeds in your page or sidebar as a widget
                 <div class="inside">                                                   
                 </div>               
                 <!--            </div>   -->
@@ -1263,7 +1394,7 @@ function wpsFeeds() {
                 ?>
             </div>            
         </div>    
-    <?php displayRight(); ?>
+        <?php displayRight(); ?>
     </div>
     <?php
 }
@@ -1286,16 +1417,16 @@ function wpsCustomText() {
     ?>
 
     <script>
-        jQuery(document).ready(function () {
+        jQuery(document).ready(function() {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#companyID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function (data) {
+                success: function(data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -1325,8 +1456,166 @@ function wpsCustomText() {
                 ?>
             </div>            
         </div>    
-    <?php displayRight(); ?>
+        <?php displayRight(); ?>
     </div>
     <?php
+}
+
+function _socialStatusMessage($string) {
+    if ($_SESSION['area_status'] == 'success') {
+        unset($_SESSION['area_status']);
+        ?>
+        <div class="alert-box success"><span>Success : </span>New <?php echo $string; ?> has been added successfully</div>
+        <?php
+    } else if ($_SESSION['area_status'] == 'failed') {
+        unset($_SESSION['area_status']);
+        ?>
+        <div class="alert-box errormes"><span>Error : </span>Problem in creating new <?php echo $string; ?>.</div>
+        <?php
+    } else if ($_SESSION['area_status'] == 'updated') {
+        unset($_SESSION['area_status']);
+        ?>
+        <div class="alert-box success"><span>Success : </span><?php echo $string; ?> has been updated successfully.</div>
+        <?php
+    } else if ($_SESSION['area_status'] == 'deletesuccess') {
+        unset($_SESSION['area_status']);
+        ?>
+        <div class="alert-box success"><span>Success : </span><?php echo $string; ?> has been deleted successfully.</div>
+        <?php
+    } else if ($_SESSION['area_status'] == 'deletefailed') {
+        unset($_SESSION['area_status']);
+        ?>
+        <div class="alert-box errormes"><span>Error : </span>Problem in deleting <?php echo $string; ?>.</div>
+        <?php
+    } else if ($_SESSION['area_status'] == 'invalid_file') {
+        unset($_SESSION['area_status']);
+        ?>
+        <div class="alert-box errormes"><span>Error : </span><?php echo $string; ?> should be a PHP file.</div>
+        <?php
+    }
+}
+
+function saveSocialSeoColorPicker() {
+    session_start();
+    global $wpdb;
+    if (isset($_POST['submit_form_settings'])) {
+        if (isset($_POST['picker1']))
+            $insertArray['picker1'] = $_POST['picker1'];
+        if (isset($_POST['picker2']))
+            $insertArray['picker2'] = $_POST['picker2'];
+        if (isset($_POST['picker3']))
+            $insertArray['picker3'] = $_POST['picker3'];
+        if (isset($_POST['picker4']))
+            $insertArray['picker4'] = $_POST['picker4'];
+
+        $serialize_array = serialize($insertArray);
+        update_option('social_seo_options_picker', $serialize_array);
+        $_SESSION['area_status'] = 'updated';
+        wp_redirect(admin_url('admin.php?page=wps-rich-snippets-review'));
+    }
+    wp_redirect(admin_url('admin.php?page=wps-rich-snippets-review'));
+}
+
+function display_all_rich_snippets() {
+    session_start();
+    global $wpdb;
+    $get_option_details = unserialize(get_option('social_seo_options_picker'));
+    if (!empty($get_option_details)) {
+        if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
+            $picker1 = $get_option_details['picker1'];
+        if (isset($get_option_details['picker2']) && $get_option_details['picker2'] != '')
+            $picker2 = $get_option_details['picker2'];
+        if (isset($get_option_details['picker3']) && $get_option_details['picker3'] != '')
+            $picker3 = $get_option_details['picker3'];
+    } else {
+        $picker1 = '#CCCCCC';
+        $picker2 = '#FFF000';
+        $picker3 = '#FFFFFF';
+    }
+    wp_enqueue_style('ratingcss', plugins_url('js/jRating.jquery.css', __FILE__));
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
+    ?>
+    <style>       
+        .gnrl-class-all{
+            padding: 0px 0px 10px 0px;
+            display:block;
+            line-height: 20px;
+        }
+        .gnrl-new-class-all{
+            display:block;
+            line-height: 20px;
+            float:right;
+        }
+        .top-class-all{
+            background: none repeat scroll 0 0 <?php echo $picker2; ?>;
+            border-radius: 5px;
+            color: #000 !important;
+            margin-bottom: 5px;
+            /*            margin-top: 30px;*/
+            padding: 10px;          
+        }
+        .bottom-class-all {
+            background: none repeat scroll 0 0 <?php echo $picker3; ?>;
+            border-radius: 5px;
+            color: #000;
+            display: inline-block;
+            float: right;
+            font-style: italic;
+            font-weight: normal;
+            padding: 5px 10px;
+            text-align: right;
+        }
+        .testimonial-all{
+            background: none repeat scroll 0 0 <?php echo $picker1; ?>;
+            display:inline-block;
+            border-radius:5px;
+            padding: 10px;
+            width: 100%;
+        }
+        .display-all-reviews-all{
+            list-style:none;
+        }
+        .display-all-reviews-all li{
+            margin: 0px 0px 10px 0px;
+        }
+        .listing-all-reviews-all{
+            width:100%
+        }
+    </style>
+    <script>
+        var ratingUrl = "<?php echo plugins_url(); ?>/wp-social-seo/";
+    </script>
+    <?php
+    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
+    if (!empty($Lists)) {
+        $i = 0;
+        $display = '';
+        $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
+        $display .='<script>jQuery(document).ready(function () {                   
+        jQuery(\'.basic\').jRating({
+	  isDisabled : true
+	});
+        });</script> <div class="listing-all-reviews-all"><ul class="display-all-reviews-all">';
+        foreach ($Lists as $List) {
+            $display .='
+            <li>
+            <div class = "hms-testimonial-container-all" itemscope itemtype = "http://data-vocabulary.org/Review">
+            <div class = "testimonial-all">
+            <div class = "top-class-all">
+            <div class = "gnrl-class-all" itemprop = "itemreviewed">' . stripcslashes($List->item_name) . '</div>
+            <div class = "gnrl-class-all" itemprop = "description">' . preg_replace('/\\\\/', '', $List->description) . '</div>
+            </div>
+            <div class = "bottom-class-all">
+            <div class = "gnrl-new-class-all" itemprop = "reviewer">Reviewed by <i><a href = "' . $List->url . '" target = "_blank">' . stripcslashes($List->reviewer_name) . '</a></i> on <time itemprop = "dtreviewed" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
+            <div class = "gnrl-new-class-all" itemprop = "rating"><div class = "basic" data-average = "' . $List->rating . '" data-id = "1"></div></div>
+            </div>
+            </div>
+            </div>
+            </li>';
+        }
+        $display .=' </ul > </div>';
+        return $display;
+    }
 }
 ?>

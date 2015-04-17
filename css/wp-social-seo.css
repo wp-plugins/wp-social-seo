@@ -424,3 +424,44 @@ td.rr_admin_review_content_container
     float: left;
     width: 100%;
 }
+
+.alert-box {
+    color:#555;
+    border-radius:10px;
+    font-family:Tahoma,Geneva,Arial,sans-serif;font-size:11px;
+    padding:10px 10px;
+    margin:0px 0px 10px 0px;
+}
+.alert-box span {
+    font-weight:bold;
+    text-transform:uppercase;
+}
+.errormes {
+    background:#ffecec no-repeat 10px 50%;
+    border:1px solid #f5aca6;
+    padding: 10px;
+}
+.success {
+    background:#e9ffd9 no-repeat 10px 50%;
+    border:1px solid #a6ca8a;
+    padding: 10px;
+}
+.warning {
+    background:#fff8c4 no-repeat 10px 50%;
+    border:1px solid #f2c779;
+    padding: 10px;
+}
+.notice {
+    background:#e3f7fc  no-repeat 10px 50%;
+    border:1px solid #8ed9f6;
+    padding: 10px;
+}
+.info_class{
+    background: none repeat scroll 0 0 #82CAFA;    
+    display: inline-block;    
+    padding:10px;
+    width: 100%;
+}        
+.wp-admin select {
+    width: 190px;
+} 

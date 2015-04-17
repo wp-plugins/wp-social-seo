@@ -88,7 +88,7 @@ class Wps_Review_List_Table extends WP_List_Table_Copy {
     function get_columns() {
         $columns = array(
             'cb' => '<input type="checkbox" />',
-            'item_name' => __('Item name', 'wpssocialseo'),
+            'item_name' => __('Review of', 'wpssocialseo'),
             'reviewer_name' => __('Reviewer name', 'wpssocialseo'),
             'summary' => __('Summary', 'wpssocialseo'),
             'rating' => __('Rating', 'wpssocialseo'),

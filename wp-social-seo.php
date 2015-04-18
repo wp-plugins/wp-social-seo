@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 3.03
+ * Version: 3.04
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -1115,7 +1115,7 @@ function display_rich_snippets() {
         foreach ($Lists as $List) {
             $display .='
             <li>
-            <div class = "hms-testimonial-container" itemscope itemtype = "http://data-vocabulary.org/Review">
+            <div class = "hms-testimonial-container-new" itemscope itemtype = "http://data-vocabulary.org/Review">
             <div class = "testimonial">
             <div class = "top-class">
             <div class = "gnrl-class" itemprop = "itemreviewed">' . stripcslashes($List->item_name) . '</div>

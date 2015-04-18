@@ -114,7 +114,7 @@ class reviews extends WP_Widget {
             foreach ($Lists as $List) {
                 $display .='
             <li>
-            <div class = "hms-testimonial-container" itemscope itemtype = "http://data-vocabulary.org/Review">
+            <div class = "hms-testimonial-container-new" itemscope itemtype = "http://data-vocabulary.org/Review">
             <div class = "testimonial">
             <div class = "top-class">
             <div class = "gnrl-class" itemprop = "itemreviewed">' . stripcslashes($List->item_name) . '</div>

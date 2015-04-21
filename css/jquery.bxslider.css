@@ -193,3 +193,7 @@ ul.bxslider li{
     /*    height: 290px !important;*/
     overflow: unset !important;
 }
+.bx-wrapper-new .bx-viewport  {
+    overflow: unset !important;
+    height:350px !important;
+}

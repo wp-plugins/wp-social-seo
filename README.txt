@@ -3,7 +3,7 @@ Contributors: pigeonhut
 Donate link: 
 Tags: Social Schema, Social marketing, google schema, Google Structured Data, Facebook Widget, sidebar, social, testimonials, widget, Google Structured Markup, Meta Markup, Structured Data
 Requires at least: 3.0
-Tested up to: 4.1
+Tested up to: 4.2
 Stable tag: 1.1.5
 
 WP Social SEO gives you the ability to quick add your Social Profiles in a compliant way so that it shows up in a google search.  

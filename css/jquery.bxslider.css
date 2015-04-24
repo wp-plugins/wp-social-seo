@@ -23,14 +23,14 @@
     max-width: 100%;
     display: block;
 }
-.bxslider {
+.bxslider,.bxslider-fb {
     margin: 0;
     padding: 0;
 }
-ul.bxslider {
+ul.bxslider,ul.bxslider-fb {
     list-style: none;
 }
-ul.bxslider li{
+ul.bxslider li,ul.bxslider-fb li{
     /*    width:240px !important;*/
 }
 .bx-viewport {

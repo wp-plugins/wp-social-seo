@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 3.06
+ * Version: 3.07
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -1004,16 +1004,17 @@ function bartag_func($atts) {
     $render = '';
     $render .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
     $render .='<script>jQuery(document).ready(function () {
-        jQuery(\'.bxslider\').bxSlider({
+        jQuery(\'.bxslider-fb\').bxSlider({
         pager :false,
         auto:true,
         mode:\'fade\',
-        speed: 1000,
+        speed: 3000,
         pause:10000,
         controls:false,
-        autoHover:true,
         wrapperClass: \'bx-wrapper-new\',
-        });        
+        autoHover:true,
+        adaptiveHeight:true
+        });       
         });</script>       
                     <ul class="bxslider">';
     foreach ($names as $name) {

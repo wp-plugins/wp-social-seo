@@ -13,7 +13,7 @@
 ===================================*/
 .bx-wrapper {
     position: relative;
-    margin: 0 auto 60px;
+    margin: 0 auto 40px !important;
     padding: 0;
     *zoom: 1;
     -ms-touch-action: pan-y;
@@ -23,14 +23,14 @@
     max-width: 100%;
     display: block;
 }
-.bxslider,.bxslider-fb {
+.bxslider,.bxslider-fb,.bxslider-reviews {
     margin: 0;
     padding: 0;
 }
-ul.bxslider,ul.bxslider-fb {
+ul.bxslider,ul.bxslider-fb,ul.bxslider-reviews {
     list-style: none;
 }
-ul.bxslider li,ul.bxslider-fb li{
+ul.bxslider li,ul.bxslider-fb li,ul.bxslider-reviews li{
     /*    width:240px !important;*/
 }
 .bx-viewport {

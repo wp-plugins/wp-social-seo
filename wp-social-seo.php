@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 3.07
+ * Version: 3.08
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -1030,6 +1030,10 @@ function bartag_func($atts) {
 function display_rich_snippets() {
     session_start();
     global $wpdb;
+    $picker1 = '#CCCCCC';
+    $picker2 = '#FFF000';
+    $picker3 = '#FFFFFF';
+    $picker4 = '#000000';
     $get_option_details = unserialize(get_option('social_seo_options_picker'));
     if (!empty($get_option_details)) {
         if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
@@ -1038,10 +1042,13 @@ function display_rich_snippets() {
             $picker2 = $get_option_details['picker2'];
         if (isset($get_option_details['picker3']) && $get_option_details['picker3'] != '')
             $picker3 = $get_option_details['picker3'];
+        if (isset($get_option_details['picker4']) && $get_option_details['picker4'] != '')
+            $picker4 = $get_option_details['picker4'];
     } else {
         $picker1 = '#CCCCCC';
         $picker2 = '#FFF000';
         $picker3 = '#FFFFFF';
+        $picker4 = '#000000';
     }
     ?>
     <style>       
@@ -1054,6 +1061,9 @@ function display_rich_snippets() {
             display:block;
             line-height: 20px;
             float:right;
+        }
+        .gnrl-new-class a{
+            color: <?php echo $picker4; ?>;
         }
         .top-class{
             background: none repeat scroll 0 0 <?php echo $picker2; ?>;
@@ -1099,7 +1109,7 @@ function display_rich_snippets() {
         $display = '';
         //$display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
         $display .='<script>jQuery(document).ready(function () {           
-        jQuery(\'.bxslider\').bxSlider({
+        jQuery(\'.bxslider-reviews\').bxSlider({
         pager :false,
         auto:true,
         mode:\'fade\',
@@ -1112,7 +1122,7 @@ function display_rich_snippets() {
 	  isDisabled : true
 	});
         });</script>       
-                    <ul class="bxslider">';
+                    <ul class="bxslider-reviews">';
         foreach ($Lists as $List) {
             $display .='
             <li>
@@ -1258,11 +1268,12 @@ function render_rr_information_rich_snippets() {
 function render_rr_color_picker_settings() {
     session_start();
     global $wpdb;
-    $picker1 = '';
-    $picker2 = '';
-    $picker3 = '';
-    $picker4 = '';
+    $picker1 = '#CCCCCC';
+    $picker2 = '#FFF000';
+    $picker3 = '#FFFFFF';
+    $picker4 = '#000000';
     $call_back_admin_email = '';
+
     $get_option_details = unserialize(get_option('social_seo_options_picker'));
     if (!empty($get_option_details)) {
         if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
@@ -1271,10 +1282,13 @@ function render_rr_color_picker_settings() {
             $picker2 = $get_option_details['picker2'];
         if (isset($get_option_details['picker3']) && $get_option_details['picker3'] != '')
             $picker3 = $get_option_details['picker3'];
+        if (isset($get_option_details['picker4']) && $get_option_details['picker4'] != '')
+            $picker4 = $get_option_details['picker4'];
     } else {
         $picker1 = '#CCCCCC';
         $picker2 = '#FFF000';
         $picker3 = '#FFFFFF';
+        $picker4 = '#000000';
     }
     _socialStatusMessage('Color picker settings');
     if ($dropdown == 1) {
@@ -1298,7 +1312,11 @@ function render_rr_color_picker_settings() {
                                 <tr>
                                     <td>Bottom background color : </td>
                                     <td><input readonly type="text" id="picker3" name="picker3" style="border-color:' . $picker3 . '" value="' . $picker3 . '"></input></td>
-                                </tr>                                                                                                                 
+                                </tr>
+                                <tr>
+                                    <td>Bottom background color : </td>
+                                    <td><input readonly type="text" id="picker4" name="picker4" style="border-color:' . $picker4 . '" value="' . $picker4 . '"></input></td>
+                                </tr>
                                 <tr>                                
                                     <td colspan="2"><input class="button-primary" type="submit" id="submit_form_settings" name="submit_form_settings"></input></td>
                                 </tr>
@@ -1309,16 +1327,17 @@ function render_rr_color_picker_settings() {
         function validate() {
             var picker1 = jQuery(\'#picker1\').val();
             var picker2 = jQuery(\'#picker2\').val();
-            var picker3 = jQuery(\'#picker3\').val();          
+            var picker3 = jQuery(\'#picker3\').val();  
+            var picker4 = jQuery(\'#picker4\').val();  
             var call_back_admin_email = jQuery(\'#call_back_admin_email\').val();
-            if (picker1 == \'\' || picker2 == \'\' || picker3 == \'\') {
+            if (picker1 == \'\' || picker2 == \'\' || picker3 == \'\' || picker4 == \'\') {
                 alert(\'Please fill all the required fields\');
                 return false;
             }
             return true;
         }
         jQuery(document).ready(function () {
-            jQuery(\'#picker1,#picker2,#picker3\').colpick({
+            jQuery(\'#picker1,#picker2,#picker3,#picker4\').colpick({
                 layout: \'hex\',
                 submit: 0,
                 color: \'3289c7\',

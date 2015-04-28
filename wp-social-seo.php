@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 3.08
+ * Version: 3.09
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -52,7 +52,14 @@ function wps_admin_init() {
             `dateCreated` timestamp NOT NULL,
             PRIMARY KEY (`id`))ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;";
     $wpdb->query($sql);
-    $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD url TEXT NOT NULL AFTER `description`");
+    $table_name = $wpdb->prefix . 'rich_snippets_review';
+    $tableNameArray = array();
+    foreach ($wpdb->get_col("DESC " . $table_name, 0) as $column_name) {
+        $tableNameArray[] = $column_name;
+    }
+    if (!in_array('url', $tableNameArray)) {
+        $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD url TEXT NOT NULL AFTER `description`");
+    }
     add_menu_page(__('Structured Markup', 'wps'), __('Structured Markup', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
     //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
     add_submenu_page('', __('Social seo', 'wps'), __('Social seo', 'wps'), 'manage_options', 'wps-manage-social-seo', 'wpsmanageSocialSeo');
@@ -92,16 +99,16 @@ function wpscallWebNicePlc() {
     ?>
 
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#companyID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function(data) {
+                success: function (data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -288,15 +295,15 @@ function wpsmanageSocialSeo() {
     echo admin_tabs($my_plugin_tabs);
     ?>    
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#settingsID').ajaxForm({
-                success: function(data) {
+                success: function (data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -402,18 +409,18 @@ function wpsmanageFacebookReview() {
     echo admin_tabs($my_plugin_tabs);
     ?>
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#facebookReview').ajaxForm({
-                success: function(data) {
+                success: function (data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
-            jQuery('#btnAdd').click(function() {
+            jQuery('#btnAdd').click(function () {
                 var num = jQuery('.clonedInput').length, // Checks to see how many "duplicatable" input fields we currently have
                         newNum = new Number(num + 1), // The numeric ID of the new input field being added, increasing by 1 each time
                         newElem = jQuery('#entry' + num).clone().attr('id', 'entry' + newNum).fadeIn('fast'); // create the new element via clone(), and manipulate it's ID using newNum value
@@ -436,13 +443,13 @@ function wpsmanageFacebookReview() {
                 //if (newNum == 5)
                 //jQuery('#btnAdd').attr('disabled', true).prop('value', "You've reached the limit"); // value here updates the text in the 'add' button when the limit is reached 
             });
-            jQuery('#btnDel').click(function() {
+            jQuery('#btnDel').click(function () {
                 // Confirmation dialog box. Works on all desktop browsers and iPhone.
                 //                if (confirm("Are you sure you wish to remove this section? This cannot be undone."))
                 //                {
                 var num = jQuery('.clonedInput').length;
                 // how many "duplicatable" input fields we currently have
-                jQuery('#entry' + num).slideUp('fast', function() {
+                jQuery('#entry' + num).slideUp('fast', function () {
                     jQuery(this).remove();
                     // if only one element remains, disable the "remove" button
                     if (num - 1 === 1)
@@ -562,16 +569,16 @@ function wpsmanageAddRichSnippets() {
     echo admin_tabs($my_plugin_tabs);
     ?>
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#reviewID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function(data) {
+                success: function (data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -724,9 +731,9 @@ function wpsmanageRichSnippets() {
     echo admin_tabs($my_plugin_tabs);
     ?>   
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             jQuery("body").addClass("wps-admin-page")
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -1374,16 +1381,16 @@ function wpsFeeds() {
     ?>
 
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#companyID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function(data) {
+                success: function (data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });
@@ -1437,16 +1444,16 @@ function wpsCustomText() {
     ?>
 
     <script>
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             jQuery("body").addClass("wps-admin-page")
             // binds form submission and fields to the validation engine
             jQuery('#companyID').ajaxForm({
                 beforeSubmit: wpsValidate,
-                success: function(data) {
+                success: function (data) {
                     jQuery('.success').show();
                 }
             });
-            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function(n) {
+            jQuery(".wps-postbox-container .handlediv, .wps-postbox-container .hndle").on("click", function (n) {
                 return n.preventDefault(), jQuery(this).parent().toggleClass("closed");
             });
         });

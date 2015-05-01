@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 3.09
+ * Version: 4.00
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -21,6 +21,9 @@ if (!class_exists('NMRichReviewsAdminHelper')) {
 if (!class_exists('reviews')) {
     require_once( plugin_dir_path(__FILE__) . 'class/class-reviews.php' );
 }
+if (!class_exists('fbpost')) {
+    require_once( plugin_dir_path(__FILE__) . 'class/class-fb-post.php' );
+}
 add_action('widgets_init', 'wps_load_widget');
 
 add_action('admin_menu', 'wps_admin_init');
@@ -36,6 +39,7 @@ add_shortcode('wps-rich-snippets-all', 'display_all_rich_snippets');
 
 function wps_load_widget() {
     register_widget('reviews');
+    register_widget('fbpost');
 }
 
 function wps_admin_init() {
@@ -1023,7 +1027,7 @@ function bartag_func($atts) {
         adaptiveHeight:true
         });       
         });</script>       
-                    <ul class="bxslider">';
+                    <ul class="bxslider-fb">';
     foreach ($names as $name) {
         $render .= '<li><div style = "float:left;" class = "fb-post" data-href = "https://www.facebook.com/' . $name . '/posts/' . $get_option_details['id'][$i - 1] . '" data-width = "100%" data-height = "400px">
         <div class = "fb-xfbml-parse-ignore">Post by ' . str_replace('.', ' ', $name) . '.</div>

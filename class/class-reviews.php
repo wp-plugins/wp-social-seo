@@ -129,18 +129,18 @@ class reviews extends WP_Widget {
 	});
         });</script>       
                     <ul class="bxslider-reviews">';
-            foreach ($Lists as $List) {
+            foreach ($Lists as $List) {                
                 $display .='
             <li>
-            <div class = "hms-testimonial-container-new" itemscope itemtype = "http://data-vocabulary.org/Review">
+            <div class = "hms-testimonial-container-new" itemscope itemtype="http://schema.org/Review">
             <div class = "testimonial">
             <div class = "top-class">
-            <div class = "gnrl-class" itemprop = "itemreviewed">' . stripcslashes($List->item_name) . '</div>
+            <div class = "gnrl-class" itemprop="itemReviewed" itemscope itemtype="http://schema.org/Thing"><span itemprop="name">' . stripcslashes($List->item_name) . '</span></div>
             <div class = "gnrl-class" itemprop = "description">' . preg_replace('/\\\\/', '', substr($List->description, 0, 100)) . '</div>
             </div>
             <div class = "bottom-class">
-            <div class = "gnrl-new-class" itemprop = "reviewer">Reviewed by <i><a href = "' . $List->url . '" target = "_blank">' . stripcslashes($List->reviewer_name) . '</a></i> on <time itemprop = "dtreviewed" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
-            <div class = "gnrl-new-class" itemprop = "rating"><div class = "basic" data-average = "' . $List->rating . '" data-id = "1"></div></div>
+            <div class = "gnrl-new-class" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <time itemprop = "datePublished" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
+            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "1"></div></div>
             </div>
             </div>
             </div>

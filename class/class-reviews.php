@@ -112,6 +112,7 @@ class reviews extends WP_Widget {
         if (!empty($Lists)) {
             //echo $wpdb->last_query;
             $i = 0;
+            $newi=1;
             $display = '';
             $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
             $display .='<script>jQuery(document).ready(function () {           
@@ -139,12 +140,13 @@ class reviews extends WP_Widget {
             <div class = "gnrl-class" itemprop = "description">' . preg_replace('/\\\\/', '', substr($List->description, 0, 100)) . '</div>
             </div>
             <div class = "bottom-class">
-            <div class = "gnrl-new-class" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <time itemprop = "datePublished" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
-            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "1"></div></div>
+            <div class = "gnrl-new-class" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <i>' . $List->date_reviewed . '</i></div>
+            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-widget-rich-snippets-'.$newi.'"></div></div>
             </div>
             </div>
             </div>
             </li>';
+                 $newi++;
             }
             $display .=' </ul > ';
             echo $display;

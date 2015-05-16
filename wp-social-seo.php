@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 4.01
+ * Version: 4.02
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -1117,6 +1117,7 @@ function display_rich_snippets() {
     if (!empty($Lists)) {
         //echo $wpdb->last_query;
         $i = 0;
+        $newi=1;
         $display = '';
         //$display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
         $display .='<script>jQuery(document).ready(function () {           
@@ -1144,12 +1145,13 @@ function display_rich_snippets() {
             <div class = "gnrl-class" itemprop = "description">' . preg_replace('/\\\\/', '', substr($List->description, 0, 100)) . '</div>
             </div>
             <div class = "bottom-class">
-            <div class = "gnrl-new-class" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <time itemprop = "datePublished" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
-            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "1"></div></div>
+            <div class = "gnrl-new-class" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <i>' . $List->date_reviewed . '</i></div>
+            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-display-rich-snippets-'.$newi.'"></div></div>
             </div>
             </div>
             </div>
             </li>';
+            $newi++;
         }
         $display .=' </ul > ';
         return $display;
@@ -1621,6 +1623,7 @@ function display_all_rich_snippets() {
     $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
     if (!empty($Lists)) {
         $i = 0;
+        $newi=1;
         $display = '';
         $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
         $display .='<script>jQuery(document).ready(function () {                   
@@ -1638,12 +1641,13 @@ function display_all_rich_snippets() {
             <div class = "gnrl-class-all" itemprop = "description">' . preg_replace('/\\\\/', '', $List->description) . '</div>
             </div>
             <div class = "bottom-class-all">
-            <div class = "gnrl-new-class-all" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <time itemprop = "datePublished" datetime = "' . $List->date_reviewed . '"><i>' . $List->date_reviewed . '</i></time></div>
-            <div class = "gnrl-new-class-all" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"> <span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "1"></div></div>
+            <div class = "gnrl-new-class-all" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <i>' . $List->date_reviewed . '</i></div>
+            <div class = "gnrl-new-class-all" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"> <span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-display-all-rich-snippets-'.$newi.'"></div></div>
             </div>
             </div>
             </div>
             </li>';
+            $newi++;
         }
         $display .=' </ul > </div>';
         return $display;

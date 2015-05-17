@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 4.02
+ * Version: 4.03
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -1113,7 +1113,7 @@ function display_rich_snippets() {
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
     wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
-    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
+    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ORDER BY rand()');
     if (!empty($Lists)) {
         //echo $wpdb->last_query;
         $i = 0;
@@ -1620,7 +1620,7 @@ function display_all_rich_snippets() {
         var ratingUrl = "<?php echo plugins_url(); ?>/wp-social-seo/";
     </script>
     <?php
-    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
+    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ORDER BY rand()');
     if (!empty($Lists)) {
         $i = 0;
         $newi=1;

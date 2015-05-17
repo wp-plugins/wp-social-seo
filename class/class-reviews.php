@@ -108,7 +108,7 @@ class reviews extends WP_Widget {
         wp_enqueue_script('jquery');
         wp_enqueue_script('jquery_carousel', plugins_url('../js/jquery.bxslider.js', __FILE__));
         wp_enqueue_script('jquery_rating', plugins_url('../js/jRating.jquery.js', __FILE__));
-        $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review');
+        $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ORDER BY rand()');
         if (!empty($Lists)) {
             //echo $wpdb->last_query;
             $i = 0;

@@ -19,7 +19,8 @@ class Wps_Review_List_Table extends WP_List_Table_Copy {
             $this->example_data[$i]['item_name'] = stripcslashes($List->item_name);
             $this->example_data[$i]['reviewer_name'] = stripcslashes($List->reviewer_name);            
             $this->example_data[$i]['summary'] = stripcslashes($List->summary);           
-            $this->example_data[$i]['rating'] = stripcslashes($List->rating);                            
+            $this->example_data[$i]['rating'] = stripcslashes($List->rating);
+            $this->example_data[$i]['page'] = get_the_title($List->pageid);
             if ($_GET['paged'] != '') {
                 $actions = array(
                     'edit' => sprintf('<a href="?page=%s&action=%s&review=%s&paged=%s">Edit</a>', 'wps-add-rich-snippets-review', 'edit', $List->id, $_GET['paged']),
@@ -68,6 +69,7 @@ class Wps_Review_List_Table extends WP_List_Table_Copy {
             case 'reviewer_name':
             case 'summary':
             case 'rating':
+            case 'page':
             case 'Action':
                 return $item[$column_name];
             default:
@@ -80,7 +82,8 @@ class Wps_Review_List_Table extends WP_List_Table_Copy {
             'item_name' => array('item_name', false),
             'reviewer_name' => array('reviewer_name', false),
             'summary' => array('summary', false),
-            'rating' => array('rating', false)            
+            'rating' => array('rating', false),
+            'page' => array('page', false)
         );
         return $sortable_columns;
     }
@@ -92,6 +95,7 @@ class Wps_Review_List_Table extends WP_List_Table_Copy {
             'reviewer_name' => __('Reviewer name', 'wpssocialseo'),
             'summary' => __('Summary', 'wpssocialseo'),
             'rating' => __('Rating', 'wpssocialseo'),
+            'page' => __('Page', 'wpssocialseo'),
             'Action' => __('Action', 'wpssocialseo'),
         );
         return $columns;

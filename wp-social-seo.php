@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 4.03
+ * Version: 4.04
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -63,6 +63,9 @@ function wps_admin_init() {
     }
     if (!in_array('url', $tableNameArray)) {
         $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD url TEXT NOT NULL AFTER `description`");
+    }
+    if (!in_array('pageid', $tableNameArray)) {
+        $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD pageid int(10) NOT NULL AFTER `url`");
     }
     add_menu_page(__('Structured Markup', 'wps'), __('Structured Markup', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
     //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
@@ -560,6 +563,7 @@ function wpsmanageAddRichSnippets() {
             $getStatus = $getDetails->status;
             $getRating = $getDetails->rating;
             $getUrl = $getDetails->url;
+            $getPageId = $getDetails->pageid;
         }
     }
     $my_plugin_tabs = array(
@@ -659,7 +663,7 @@ function wpsmanageAddRichSnippets() {
                                     </tr>-->
                                     <tr height="50">
                                         <td>Description : </td>
-                                        <td><textarea type="text" id="description" name="description"><?php echo $getDescription; ?></textarea></td>
+                                        <td><textarea type="text" id="description" name="description"><?php echo stripcslashes($getDescription); ?></textarea></td>
                                     </tr>
                                     <tr height="50">
                                         <td>URL : </td>
@@ -671,15 +675,45 @@ function wpsmanageAddRichSnippets() {
     <!--                                            <input type="text" id="rating" name="rating" value="<?php echo $getRating; ?>" />-->
                                             <select id="rating" name="rating"> 
                                                 <option value=''>Select rating</option>
-                                                <option value='1'>1</option>
-                                                <option value='2'>2</option>
-                                                <option value='3'>3</option>
-                                                <option value='4'>4</option>
-                                                <option value='5'>5</option>
+                                                <?php
+                                                $ratings = array(1, 2, 3, 4, 5);
+                                                foreach ($ratings as $rating) {
+                                                    $pChecked = '';
+                                                    if ($getRating == $rating) {
+                                                        $pChecked = 'selected="selected"';
+                                                    }
+                                                    $option = '<option ' . $pChecked . ' value="' . $rating . '">';
+                                                    $option .= $rating;
+                                                    $option .= '</option>';
+                                                    echo $option;
+                                                }
+                                                ?>                                                
                                             </select>
                                         </td>
 
-                                    </tr> 
+                                    </tr>
+                                    <tr height="50">
+                                        <td>Page id : </td>
+                                        <td>
+                                            <select id="pageid" name="pageid"> 
+                                                <option value=''>Select Page</option>
+                                                <?php
+                                                $pages = get_pages();
+                                                foreach ($pages as $page) {
+                                                    $pChecked = '';
+                                                    if ($getPageId == $page->ID) {
+                                                        $pChecked = 'selected="selected"';
+                                                    }
+                                                    $option = '<option ' . $pChecked . ' value="' . $page->ID . '">';
+                                                    $option .= $page->post_title;
+                                                    $option .= '</option>';
+                                                    echo $option;
+                                                }
+                                                ?>
+                                            </select>
+                                        </td>
+
+                                    </tr>
                                 </table>
                             </div>                         
                             <input class="button-primary" type="submit" value="Submit" name="submit" />    
@@ -808,9 +842,10 @@ function wpsSaveRichSnippets() {
         $insertArray['reviewer_name'] = $_POST['reviewer-name'];
         $insertArray['date_reviewed'] = $_POST['date-reviewed'];
         $insertArray['summary'] = $_POST['summary'];
-        $insertArray['description'] = $_POST['description'];
+        $insertArray['description'] = addslashes($_POST['description']);
         $insertArray['rating'] = $_POST['rating'];
         $insertArray['url'] = $_POST['url'];
+        $insertArray['pageid'] = $_POST['pageid'];
         if ($_POST['id'] != '') {
             $wpdb->update($wpdb->prefix . "rich_snippets_review", $insertArray, array('id' => $_POST['id']), array('%s', '%s'), array('%d'));
             //if ($wpdb->insert_id > 0) {
@@ -1113,11 +1148,11 @@ function display_rich_snippets() {
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
     wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
-    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ORDER BY rand()');
+    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review WHERE pageid='.get_the_ID().' ORDER BY rand()');
     if (!empty($Lists)) {
         //echo $wpdb->last_query;
         $i = 0;
-        $newi=1;
+        $newi = 1;
         $display = '';
         //$display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
         $display .='<script>jQuery(document).ready(function () {           
@@ -1146,7 +1181,7 @@ function display_rich_snippets() {
             </div>
             <div class = "bottom-class">
             <div class = "gnrl-new-class" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <i>' . $List->date_reviewed . '</i></div>
-            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-display-rich-snippets-'.$newi.'"></div></div>
+            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-display-rich-snippets-' . $newi . '"></div></div>
             </div>
             </div>
             </div>
@@ -1623,7 +1658,7 @@ function display_all_rich_snippets() {
     $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ORDER BY rand()');
     if (!empty($Lists)) {
         $i = 0;
-        $newi=1;
+        $newi = 1;
         $display = '';
         $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
         $display .='<script>jQuery(document).ready(function () {                   
@@ -1642,7 +1677,7 @@ function display_all_rich_snippets() {
             </div>
             <div class = "bottom-class-all">
             <div class = "gnrl-new-class-all" itemprop="author" itemscope="" itemtype="http://schema.org/Person">Reviewed by <i><a href = "' . $List->url . '" target = "_blank"><span itemprop="name">' . stripcslashes($List->reviewer_name) . '</span></a></i> on <i>' . $List->date_reviewed . '</i></div>
-            <div class = "gnrl-new-class-all" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"> <span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-display-all-rich-snippets-'.$newi.'"></div></div>
+            <div class = "gnrl-new-class-all" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"> <span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-display-all-rich-snippets-' . $newi . '"></div></div>
             </div>
             </div>
             </div>

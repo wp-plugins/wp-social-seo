@@ -17,6 +17,7 @@ class reviews extends WP_Widget {
 // Creating widget front-end
 // This is where the action happens
     public function widget($args, $instance) {
+        
 //        global $wpdb;
         $slider_interval = 10000;
         $transitionspeed = 3000;
@@ -29,10 +30,6 @@ class reviews extends WP_Widget {
         if (isset($instance['height']))
             $height = apply_filters('widget_title', $instance['height']);
 
-// before and after widget arguments are defined by themes
-        echo $args['before_widget'];
-        if (!empty($title))
-            echo $args['before_title'] . $title . $args['after_title'];
 //        echo "<div class='locationdiv'><form action='' method='post' style='display:inline;'><input type='text'name='location_search_box' class='location_search_box' id='location_search_box' placeholder='Find your local office'/></form></div>";
         session_start();
         global $wpdb;
@@ -108,8 +105,13 @@ class reviews extends WP_Widget {
         wp_enqueue_script('jquery');
         wp_enqueue_script('jquery_carousel', plugins_url('../js/jquery.bxslider.js', __FILE__));
         wp_enqueue_script('jquery_rating', plugins_url('../js/jRating.jquery.js', __FILE__));
-        $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ORDER BY rand()');
+        $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review WHERE pageid='.get_the_ID().' ORDER BY rand()');
         if (!empty($Lists)) {
+            
+// before and after widget arguments are defined by themes
+        echo $args['before_widget'];
+        if (!empty($title))
+            echo $args['before_title'] . $title . $args['after_title'];
             //echo $wpdb->last_query;
             $i = 0;
             $newi=1;
@@ -148,7 +150,7 @@ class reviews extends WP_Widget {
             </li>';
                  $newi++;
             }
-            $display .=' </ul > ';
+            $display .= ' </ul > ';
             echo $display;
         } else {
             echo '';

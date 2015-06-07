@@ -4,7 +4,7 @@ error_reporting(0);
  * Plugin Name: Wp Social
  * Plugin URI: http://www.web9.co.uk/
  * Description: Use structured data markup embedded in your public website to specify your preferred social profiles. You can specify these types of social profiles: Facebook, Twitter, Google+, Instagram, YouTube, LinkedIn and Myspace.
- * Version: 4.04
+ * Version: 4.05
  * Author: Jody Nesbitt (WebPlugins)
  * Author URI: http://webplugins.co.uk
  *
@@ -35,6 +35,7 @@ add_action('admin_post_submit-color-picker', 'saveSocialSeoColorPicker');
 
 add_shortcode('facebook-review-slider', 'bartag_func');
 add_shortcode('wps-rich-snippets', 'display_rich_snippets');
+add_shortcode('wps-rich-snippets-aggregate', 'display_rich_snippets_aggregate');
 add_shortcode('wps-rich-snippets-all', 'display_all_rich_snippets');
 
 function wps_load_widget() {
@@ -66,6 +67,9 @@ function wps_admin_init() {
     }
     if (!in_array('pageid', $tableNameArray)) {
         $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD pageid int(10) NOT NULL AFTER `url`");
+    }
+    if (!in_array('category', $tableNameArray)) {
+        $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "rich_snippets_review" . "` ADD category varchar(255) NOT NULL AFTER `pageid`");
     }
     add_menu_page(__('Structured Markup', 'wps'), __('Structured Markup', 'wps'), 'manage_options', 'wps-social-profile', 'wpscallWebNicePlc', '');
     //add_submenu_page('', __('Your company', 'wps'), __('Your company', 'wps'), 'manage_options', 'wps-manage-your-company', 'wpsmanageCompany');
@@ -564,6 +568,7 @@ function wpsmanageAddRichSnippets() {
             $getRating = $getDetails->rating;
             $getUrl = $getDetails->url;
             $getPageId = $getDetails->pageid;
+            $getCategory = $getDetails->category;
         }
     }
     $my_plugin_tabs = array(
@@ -695,24 +700,31 @@ function wpsmanageAddRichSnippets() {
                                     <tr height="50">
                                         <td>Page id : </td>
                                         <td>
-                                            <select id="pageid" name="pageid"> 
+    <!--                                            <select id="pageid" name="pageid"> 
                                                 <option value=''>Select Page</option>
-                                                <?php
-                                                $pages = get_pages();
-                                                foreach ($pages as $page) {
-                                                    $pChecked = '';
-                                                    if ($getPageId == $page->ID) {
-                                                        $pChecked = 'selected="selected"';
-                                                    }
-                                                    $option = '<option ' . $pChecked . ' value="' . $page->ID . '">';
-                                                    $option .= $page->post_title;
-                                                    $option .= '</option>';
-                                                    echo $option;
+                                            <?php
+                                            $pages = get_pages();
+                                            foreach ($pages as $page) {
+                                                $pChecked = '';
+                                                if ($getPageId == $page->ID) {
+                                                    $pChecked = 'selected="selected"';
                                                 }
-                                                ?>
-                                            </select>
+                                                $option = '<option ' . $pChecked . ' value="' . $page->ID . '">';
+                                                $option .= $page->post_title;
+                                                $option .= '</option>';
+                                                echo $option;
+                                            }
+                                            ?>
+                                            </select>-->
+                                            <input type="number" name="pageid" id="pageid" value="<?php echo $getPageId; ?>"/>
                                         </td>
 
+                                    </tr>
+                                    <tr height="50">
+                                        <td>Category : </td>
+                                        <td>
+                                            <input type="text" name="category" id="category" value="<?php echo $getCategory; ?>"/>
+                                        </td>
                                     </tr>
                                 </table>
                             </div>                         
@@ -820,6 +832,20 @@ function wpsmanageRichSnippets() {
                 <?php
                 NMRichReviewsAdminHelper::render_postbox_close();
                 NMRichReviewsAdminHelper::render_container_close();
+                
+                NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('[wps-rich-snippets]');
+                render_rr_show_content_snippets();
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                
+                 NMRichReviewsAdminHelper::render_container_open('content-container');
+                NMRichReviewsAdminHelper::render_postbox_open('[wps-rich-snippets-aggregate]');
+                render_rr_show_content_snippets_aggreagate();
+                NMRichReviewsAdminHelper::render_postbox_close();
+                NMRichReviewsAdminHelper::render_container_close();
+                
+                
                 NMRichReviewsAdminHelper::render_container_open('content-container');
                 NMRichReviewsAdminHelper::render_postbox_open('About');
                 render_rr_show_content();
@@ -833,6 +859,66 @@ function wpsmanageRichSnippets() {
     <?php
 }
 
+function render_rr_show_content_snippets(){
+    $op='<div class="rr_shortcode_container">
+				<div class="rr_shortcode_name">[wps-rich-snippets]</div>
+				<div class="rr_shortcode_description">
+					This is the main shortcode for this plugin. By default (if no options are given), it will show the first three global reviews. Note that this shortcode on its own will NOT display an average/overall score nor any rich snippet markup. See the "snippet" shortcode for that. Here is the shortcode with all possible options, along with their defaults: [wps-rich-snippets review_category="none" review_num="3"]. We will now show some examples of using these options.
+				</div>
+				<div class="rr_shortcode_option_container">
+					<div class="rr_shortcode_option_name">[wps-rich-snippets review_num="8"]</div>
+					<div class="rr_shortcode_option_text">
+						This will show the first eight global reviews. Any integer greater than or equal to one may be used, and note that (given enough room) reviews are displayed in blocks of three.
+					</div>
+				</div>
+				<div class="rr_shortcode_option_container">
+					<div class="rr_shortcode_option_name">[wps-rich-snippets review_num="all"]</div>
+					<div class="rr_shortcode_option_text">
+						This will show EVERY global review which has been posted to your site. This is the only non-integer value which works as the value for the "review_num" option.
+					</div>
+				</div><div class="rr_shortcode_option_container">
+					<div class="rr_shortcode_option_name">[wps-rich-snippets review_category="page"]</div>
+					<div class="rr_shortcode_option_text">
+						This will show the first three reviews for the page or post on which this shortcode appears. You can also use review_category="post" and achieve the same results (because sometimes you just can\'t remember if you\'re supposed to say post or page! :-) )
+					</div>
+				</div>
+				<div class="rr_shortcode_option_container">
+					<div class="rr_shortcode_option_name">[wps-rich-snippets review_category="foo"]</div>
+					<div class="rr_shortcode_option_text">
+						This will show the first three reviews which have the review_category "foo" (you might also use categories of "games" or "iPhone" or "bears" (although everyone knows that the best kind of bear is grizzly) ). The categories here are determined by the categories you specify when presenting the review form to your users.
+					</div>
+				</div>
+				<div class="rr_shortcode_option_container">
+					<div class="rr_shortcode_option_name">[wps-rich-snippets review_category="bar" review_num="6"]</div>
+					<div class="rr_shortcode_option_text">
+						This will show the first six reviews which have the category "bar". Again, you may use any review_category, and if you specify that review_category="page" then the first six reviews for that particular page/post will be displayed.
+					</div>
+				</div>
+			</div>';
+    echo $op;
+}
+function render_rr_show_content_snippets_aggreagate(){
+    $op='<div class="rr_shortcode_container">
+				<div class="rr_shortcode_name">[wps-rich-snippets-aggregate]</div>
+				<div class="rr_shortcode_description">
+					This shortcode will insert an aggregate (average) score based on all reviews. By default, this aggregate score is based on the global reviews (as you might guess, the shortcode with its one option and corresponding default is [wps-rich-snippets-aggregate review_category="none"]). More importantly for webmasters and those concerned with SEO is that this shortcode tags the aggregate score with Rich Snippet markup so that Google (and other search engines) will see the average score on that page, and display stars next to that page when it shows up in search results.<br>
+					You can test your page <a href="http://www.google.com/webmasters/tools/richsnippets">here</a>. Note that Google is vague with exactly how exactly they give search results. It might take some time for the stars to show up next to your page, and it might only show up with specific search terms. The best thing you can do is make sure that the Rich Snippets tool, above, recognizes the star rating on your page, and be patient. We are constantly working to make sure we keep up with Google to ensure these ratings are displayed.
+				</div>
+				<div class="rr_shortcode_option_container">
+					<div class="rr_shortcode_option_name">[wps-rich-snippets-aggregate review_category="foo"]</div>
+					<div class="rr_shortcode_option_text">
+						This will display the aggregate (average) score, along with the Rich Snippet markup, for all reviews with the category "foo".
+					</div>
+				</div>
+				<div class="rr_shortcode_option_container">
+					<div class="rr_shortcode_option_name">[wps-rich-snippets-aggregate review_category="page"]</div>
+					<div class="rr_shortcode_option_text">
+						This will display the aggregate (average) score, along with the Rich Snippet markup, for all reviews for the current page/post (again, you may equivalently use review_category="post").
+					</div>
+				</div>
+			</div>';
+    echo $op;
+}
 function wpsSaveRichSnippets() {
     session_start();
     global $wpdb;
@@ -846,6 +932,7 @@ function wpsSaveRichSnippets() {
         $insertArray['rating'] = $_POST['rating'];
         $insertArray['url'] = $_POST['url'];
         $insertArray['pageid'] = $_POST['pageid'];
+        $insertArray['category'] = $_POST['category'];
         if ($_POST['id'] != '') {
             $wpdb->update($wpdb->prefix . "rich_snippets_review", $insertArray, array('id' => $_POST['id']), array('%s', '%s'), array('%d'));
             //if ($wpdb->insert_id > 0) {
@@ -1073,9 +1160,15 @@ function bartag_func($atts) {
     return $render;
 }
 
-function display_rich_snippets() {
+function display_rich_snippets($atts) {
     session_start();
     global $wpdb;
+    extract(shortcode_atts(
+                    array(
+        'review_category' => 'none',
+        'review_num' => '3',
+                    )
+                    , $atts));
     $picker1 = '#CCCCCC';
     $picker2 = '#FFF000';
     $picker3 = '#FFFFFF';
@@ -1138,6 +1231,9 @@ function display_rich_snippets() {
             padding: 10px;
             width: 100%;
         }
+        .rich_snippets_review li{
+            padding:0px 0px 10px 0px;
+        }
     </style>
     <script>
         var ratingUrl = "<?php echo plugins_url(); ?>/wp-social-seo/";
@@ -1146,30 +1242,35 @@ function display_rich_snippets() {
     wp_enqueue_style('carouselcss', plugins_url('css/jquery.bxslider.css', __FILE__));
     wp_enqueue_style('ratingcss', plugins_url('js/jRating.jquery.css', __FILE__));
     wp_enqueue_script('jquery');
-    wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
+    //wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
     wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
-    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review WHERE pageid='.get_the_ID().' ORDER BY rand()');
+    //$Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review WHERE pageid=' . get_the_ID() . ' ORDER BY rand()');
+    $where_condition = '';
+    if ($review_category != '' && $review_category != 'none') {
+        if ($review_category == 'page')
+            $where_condition .=' WHERE pageid="' . get_the_ID() . '"';
+        else if ($review_category == 'post')
+            $where_condition .=' WHERE pageid="' . get_the_ID() . '"';
+        else
+            $where_condition .=' WHERE category="' . $review_category . '"';
+    }
+    if ($review_num != 'all')
+        $limit = ' LIMIT 0,' . $review_num;
+    else
+        $limit = '';
+    //echo 'SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ' . $where_condition.$limit;
+    $Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review ' . $where_condition . $limit);
     if (!empty($Lists)) {
         //echo $wpdb->last_query;
         $i = 0;
         $newi = 1;
         $display = '';
-        //$display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
-        $display .='<script>jQuery(document).ready(function () {           
-        jQuery(\'.bxslider-reviews\').bxSlider({
-        pager :false,
-        auto:true,
-        mode:\'fade\',
-        speed: 1000,
-        pause:4000,
-        controls:false,
-        autoHover:true
-        }); 
+        $display .='<script>jQuery(document).ready(function () {                  
         jQuery(\'.basic\').jRating({
 	  isDisabled : true
 	});
         });</script>       
-                    <ul class="bxslider-reviews">';
+                    <ul class="bxslider-reviews rich_snippets_review">';
         foreach ($Lists as $List) {
             $display .='
             <li>
@@ -1195,6 +1296,148 @@ function display_rich_snippets() {
     }
     ?>
     <?php
+}
+
+function display_rich_snippets_aggregate($atts) {
+    session_start();
+    global $wpdb;
+    extract(shortcode_atts(
+                    array(
+        'review_category' => 'none',
+        'review_num' => '3',
+                    )
+                    , $atts));
+    $picker1 = '#CCCCCC';
+    $picker2 = '#FFF000';
+    $picker3 = '#FFFFFF';
+    $picker4 = '#000000';
+    $get_option_details = unserialize(get_option('social_seo_options_picker'));
+    if (!empty($get_option_details)) {
+        if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
+            $picker1 = $get_option_details['picker1'];
+        if (isset($get_option_details['picker2']) && $get_option_details['picker2'] != '')
+            $picker2 = $get_option_details['picker2'];
+        if (isset($get_option_details['picker3']) && $get_option_details['picker3'] != '')
+            $picker3 = $get_option_details['picker3'];
+        if (isset($get_option_details['picker4']) && $get_option_details['picker4'] != '')
+            $picker4 = $get_option_details['picker4'];
+    } else {
+        $picker1 = '#CCCCCC';
+        $picker2 = '#FFF000';
+        $picker3 = '#FFFFFF';
+        $picker4 = '#000000';
+    }
+    ?>
+    <style>       
+        .gnrl-class{
+            padding: 0px 0px 10px 0px;
+            display:block;
+            line-height: 20px;
+        }
+        .gnrl-new-class-new{
+            display:block;
+            line-height: 20px;
+            float:left;
+        }
+        .gnrl-new-class-new a{
+            color: <?php echo $picker4; ?>;
+        }
+        .top-class{
+            background: none repeat scroll 0 0 <?php echo $picker2; ?>;
+            border-radius: 5px;
+            color: #000 !important;
+            margin-bottom: 5px;
+            /*            margin-top: 30px;*/
+            padding: 10px;
+            height: 100px;
+        }
+        .bottom-class-new-agg {
+            background: none repeat scroll 0 0 <?php echo $picker3; ?>;
+            border-radius: 5px;
+            color: #000;
+            display: inline-block;
+            float: right;
+            font-style: italic;
+            font-weight: normal;
+            padding: 5px 10px;
+            text-align: right;
+            width:95%
+        }
+        .testimonial-agg{
+            background: none repeat scroll 0 0 <?php echo $picker3; ?>;
+            display:inline-block;
+            border-radius:5px;
+            padding: 10px;
+            width: 100%;
+        }
+        .rich_snippets_review_aggregate{
+            display:block;
+            width:100%;
+        }
+        .rich_snippets_review_aggregate li{
+            padding:0px 0px 10px 0px;
+        }
+        
+    </style>
+    <?php
+    wp_enqueue_style('carouselcss', plugins_url('css/jquery.bxslider.css', __FILE__));
+    wp_enqueue_style('ratingcss', plugins_url('js/jRating.jquery.css', __FILE__));
+    wp_enqueue_script('jquery');
+    //wp_enqueue_script('jquery_carousel', plugins_url('js/jquery.bxslider.js', __FILE__));
+    wp_enqueue_script('jquery_rating', plugins_url('js/jRating.jquery.js', __FILE__));
+    //$Lists = $wpdb->get_results('SELECT * FROM  ' . $wpdb->prefix . 'rich_snippets_review WHERE pageid=' . get_the_ID() . ' ORDER BY rand()');
+    $where_condition = '';
+    if ($review_category != '' && $review_category != 'none') {
+        if ($review_category == 'page')
+            $where_condition .=' WHERE pageid="' . get_the_ID() . '"';
+        else if ($review_category == 'post')
+            $where_condition .=' WHERE pageid="' . get_the_ID() . '"';
+        else
+            $where_condition .=' WHERE category="' . $review_category . '"';
+    }
+//    if ($review_num != 'all')
+//        $limit = ' LIMIT 0,' . $review_num;
+//    else
+//        $limit = '';    
+    $ListsCount = $wpdb->get_var('SELECT COUNT(*) FROM  ' . $wpdb->prefix . 'rich_snippets_review ' . $where_condition);
+    if ($ListsCount != 0) {
+        $averageRating = $wpdb->get_var('SELECT AVG(rating) FROM ' . $wpdb->prefix . 'rich_snippets_review ' . $whereStatement);
+        $averageRating = floor(10 * floatval($averageRating)) / 10;
+        $decimal = $averageRating - floor($averageRating);
+        if ($decimal >= 0.5) {
+            $roundedAverage = floor($averageRating) + 1;
+        } else {
+            $roundedAverage = floor($averageRating);
+        }
+        $display = '';
+        $display .='<script>jQuery(document).ready(function () {                  
+        jQuery(\'.basic\').jRating({
+	  isDisabled : true
+	});
+        });</script>
+        <ul class="bxslider-reviews rich_snippets_review_aggregate">';
+        $display .='
+            <li>
+                <div class = "hms-testimonial-container-new" itemscope itemtype="http://data-vocabulary.org/AggregateReview">
+                    <div class = "testimonial-agg">            
+                        <div class = "bottom-class-new-agg">
+                            <div class = "gnrl-new-class-new">
+                                <span itemprop="reviewRating" itemscope itemtype="http://data-vocabulary.org/Rating">
+                                <span style="float:left">Average: <br/></span>
+                                <div style="float:left"  class = "basic" data-average = "' . $roundedAverage . '" data-id = "pn-display-rich-snippets-aggregate"></div>
+                                <span class="rating" itemprop="value" style="display: none !important;">' . $averageRating . '</span>
+                                <span style="float:left"> on <span class="votes" itemprop="votes">' . $ListsCount . '</span> reviews</span>
+                                </span>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </li>';        
+        $display .=' </ul > ';
+        return $display;
+    } else {
+        return '';
+    }
 }
 
 function displayRight() {

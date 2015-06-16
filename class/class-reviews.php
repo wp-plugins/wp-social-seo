@@ -127,7 +127,6 @@ margin:10px auto;
             $i = 0;
             $newi=1;
             $display = '';
-            $display .= '<div id="fb-root"></div><script>(function(d, s, id) {  var js, fjs = d.getElementsByTagName(s)[0];  if (d.getElementById(id)) return;  js = d.createElement(s); js.id = id;  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";  fjs.parentNode.insertBefore(js, fjs);}(document, \'script\', \'facebook-jssdk\'));</script>';
             $display .='<script>jQuery(document).ready(function () {           
         jQuery(\'.bxslider-reviews\').bxSlider({
         pager :false,
@@ -139,8 +138,8 @@ margin:10px auto;
         autoHover:true
         }); 
         jQuery(\'.basic\').jRating({
-	  isDisabled : true
-	});
+      isDisabled : true
+    });
         });</script>       
                     <ul class="bxslider-reviews">';
             foreach ($Lists as $List) {                
@@ -148,13 +147,13 @@ margin:10px auto;
             <li>
             <div class = "hms-testimonial-container-new" itemscope itemtype="http://schema.org/Review">
             <div class = "testimonial">
-			<div class="testimonial-header"></div>
-			   <div class = "bottom-class">
+            <div class="testimonial-header"></div>
+               <div class = "bottom-class">
            <div class = "gnrl-class" itemprop="itemReviewed" itemscope itemtype="http://schema.org/Thing"><span itemprop="name">' . stripcslashes($List->item_name) . '</span></div>
             <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-widget-rich-snippets-'.$newi.'"></div></div> </div>
            
-		   
-		    <div class = "top-class">
+           
+            <div class = "top-class">
            
             <div class = "gnrl-class" itemprop = "description">' . preg_replace('/\\\\/', '', substr($List->description, 0, 100)) . '</div>
  

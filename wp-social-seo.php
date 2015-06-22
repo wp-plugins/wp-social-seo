@@ -1080,6 +1080,9 @@ function display_rich_snippets() {
     $picker2 = '#FFF000';
     $picker3 = '#FFFFFF';
     $picker4 = '#000000';
+    $picker5 = '#000000';
+    $picker6 = '#000000';
+    
     $get_option_details = unserialize(get_option('social_seo_options_picker'));
     if (!empty($get_option_details)) {
         if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
@@ -1090,11 +1093,20 @@ function display_rich_snippets() {
             $picker3 = $get_option_details['picker3'];
         if (isset($get_option_details['picker4']) && $get_option_details['picker4'] != '')
             $picker4 = $get_option_details['picker4'];
+          if (isset($get_option_details['picker5']) && $get_option_details['picker5'] != '')
+            $picker5 = $get_option_details['picker5'];
+          if (isset($get_option_details['picker6']) && $get_option_details['picker6'] != '')
+            $picker6 = $get_option_details['picker6'];
+     
+
     } else {
         $picker1 = '#CCCCCC';
         $picker2 = '#FFF000';
         $picker3 = '#FFFFFF';
         $picker4 = '#000000';
+        $picker5 = '#000000';
+        $picker6 = '#000000';
+        
     }
     ?>
     <style>       
@@ -1321,6 +1333,9 @@ function render_rr_color_picker_settings() {
     $picker2 = '#FFF000';
     $picker3 = '#FFFFFF';
     $picker4 = '#000000';
+    $picker5 = '#000000';
+    $picker6 = '#000000';
+    
     $call_back_admin_email = '';
 
     $get_option_details = unserialize(get_option('social_seo_options_picker'));
@@ -1333,11 +1348,19 @@ function render_rr_color_picker_settings() {
             $picker3 = $get_option_details['picker3'];
         if (isset($get_option_details['picker4']) && $get_option_details['picker4'] != '')
             $picker4 = $get_option_details['picker4'];
+        if (isset($get_option_details['picker5']) && $get_option_details['picker5'] != '')
+            $picker5 = $get_option_details['picker5'];
+        if (isset($get_option_details['picker6']) && $get_option_details['picker6'] != '')
+            $picker6 = $get_option_details['picker6'];
+        
     } else {
         $picker1 = '#CCCCCC';
         $picker2 = '#FFF000';
         $picker3 = '#FFFFFF';
         $picker4 = '#000000';
+        $picker5 = '#000000';
+        $picker6 = '#000000';
+        
     }
     _socialStatusMessage('Color picker settings');
     if ($dropdown == 1) {
@@ -1366,6 +1389,15 @@ function render_rr_color_picker_settings() {
                                     <td>Bottom background color : </td>
                                     <td><input readonly type="text" id="picker4" name="picker4" style="border-color:' . $picker4 . '" value="' . $picker4 . '"></input></td>
                                 </tr>
+                                <tr>
+                                    <td>Top Text color : </td>
+                                    <td><input readonly type="text" id="picker5" name="picker5" style="border-color:' . $picker5 . '" value="' . $picker5 . '"></input></td>
+                                </tr>
+                                <tr>
+                                    <td>Bottom Text color : </td>
+                                    <td><input readonly type="text" id="picker6" name="picker6" style="border-color:' . $picker6 . '" value="' . $picker6 . '"></input></td>
+                                </tr>
+                            
                                 <tr>                                
                                     <td colspan="2"><input class="button-primary" type="submit" id="submit_form_settings" name="submit_form_settings"></input></td>
                                 </tr>
@@ -1378,15 +1410,18 @@ function render_rr_color_picker_settings() {
             var picker2 = jQuery(\'#picker2\').val();
             var picker3 = jQuery(\'#picker3\').val();  
             var picker4 = jQuery(\'#picker4\').val();  
+            var picker5 = jQuery(\'#picker5\').val();  
+            var picker6 = jQuery(\'#picker6\').val();  
+            
             var call_back_admin_email = jQuery(\'#call_back_admin_email\').val();
-            if (picker1 == \'\' || picker2 == \'\' || picker3 == \'\' || picker4 == \'\') {
+            if (picker1 == \'\' || picker2 == \'\' || picker3 == \'\' || picker4 == \'\' || picker5 == \'\' || picker6 == \'\') {
                 alert(\'Please fill all the required fields\');
                 return false;
             }
             return true;
         }
         jQuery(document).ready(function () {
-            jQuery(\'#picker1,#picker2,#picker3,#picker4\').colpick({
+            jQuery(\'#picker1,#picker2,#picker3,#picker4,#picker5,#picker6\').colpick({
                 layout: \'hex\',
                 submit: 0,
                 color: \'3289c7\',
@@ -1576,6 +1611,10 @@ function saveSocialSeoColorPicker() {
             $insertArray['picker3'] = $_POST['picker3'];
         if (isset($_POST['picker4']))
             $insertArray['picker4'] = $_POST['picker4'];
+        if (isset($_POST['picker5']))
+            $insertArray['picker5'] = $_POST['picker5'];
+        if (isset($_POST['picker6']))
+            $insertArray['picker6'] = $_POST['picker6'];
 
         $serialize_array = serialize($insertArray);
         update_option('social_seo_options_picker', $serialize_array);

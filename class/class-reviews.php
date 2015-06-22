@@ -37,6 +37,9 @@ class reviews extends WP_Widget {
         $picker2 = '#FFF000';
         $picker3 = '#FFFFFF';
         $picker4 = '#000000';
+        $picker5 = '#000000';
+        $picker6 = '#000000';
+
         $get_option_details = unserialize(get_option('social_seo_options_picker'));
         if (!empty($get_option_details)) {
             if (isset($get_option_details['picker1']) && $get_option_details['picker1'] != '')
@@ -47,18 +50,26 @@ class reviews extends WP_Widget {
                 $picker3 = $get_option_details['picker3'];
             if (isset($get_option_details['picker4']) && $get_option_details['picker4'] != '')
                 $picker4 = $get_option_details['picker4'];
+            if (isset($get_option_details['picker5']) && $get_option_details['picker5'] != '')
+                $picker5 = $get_option_details['picker5'];
+            if (isset($get_option_details['picker6']) && $get_option_details['picker6'] != '')
+                $picker6 = $get_option_details['picker6'];
+         
         } else {
             $picker1 = '#CCCCCC';
             $picker2 = '#FFF000';
             $picker3 = '#FFFFFF';
             $picker4 = '#000000';
+            $picker5 = '#000000';
+            $picker6 = '#000000';
+         
         }
         ?>
         <style>       
             .gnrl-class{
                 padding: 0px 0px 10px 0px;
                 display:block;
-float:left;
+                float:left;
                 line-height: 20px;
             }
             .gnrl-new-class{
@@ -72,18 +83,21 @@ float:left;
             .top-class{
                 background: none repeat scroll 0 0 <?php echo $picker2; ?>;
                 border-radius: 5px;
-                color: #000 !important;
+                color: <?php echo $picker6; ?> !important;
                 margin-bottom: 5px;
                 /*            margin-top: 30px;*/
                 padding: 10px;
                 height: <?php echo $height; ?>;
             }
+            .gnrl-class{
+                color:<?php echo $picker6; ?> !important;
+            }
             .bottom-class {
                 background: none repeat scroll 0 0 <?php echo $picker3; ?>;
                 border-radius: 5px;
-                color: #000;
-margin:10px auto;
-               
+                color: <?php echo $picker5;?> !important;
+                margin:10px auto;
+                display: inline-block;
              
                 font-style: italic;
                 font-weight: normal;
@@ -101,9 +115,15 @@ margin:10px auto;
                 width: 100%;
             }
 .testimonial-header {
-    background: rgba(0, 0, 0, 0) url("/wp-content/plugins/wp-social-seo/images/review-header.png") no-repeat scroll center center;
+    /*background: rgba(0, 0, 0, 0) url("/wp-content/plugins/wp-social-seo/images/review-header.png") no-repeat scroll center center;*/
     height: 80px;
     border-radius:5px 5px 0 0;
+    background-color:#6BC600;
+    color:#fff;
+    font-size: 26px;
+      text-align: center;
+      padding-top: 18px;
+
 }
 
         </style>
@@ -147,10 +167,13 @@ margin:10px auto;
             <li>
             <div class = "hms-testimonial-container-new" itemscope itemtype="http://schema.org/Review">
             <div class = "testimonial">
-            <div class="testimonial-header"></div>
+            <div class="testimonial-header">
+                Excellent';
+                  $display.=' <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-widget-rich-snippets-'.$newi.'"></div></div> 
+            </div>
                <div class = "bottom-class">
            <div class = "gnrl-class" itemprop="itemReviewed" itemscope itemtype="http://schema.org/Thing"><span itemprop="name">' . stripcslashes($List->item_name) . '</span></div>
-            <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-widget-rich-snippets-'.$newi.'"></div></div> </div>
+          </div>
            
            
             <div class = "top-class">

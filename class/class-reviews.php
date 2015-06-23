@@ -114,6 +114,9 @@ class reviews extends WP_Widget {
              
                 width: 100%;
             }
+            .ratings{
+                margin-top:7px;
+            }
 .testimonial-header {
     /*background: rgba(0, 0, 0, 0) url("/wp-content/plugins/wp-social-seo/images/review-header.png") no-repeat scroll center center;*/
     height: 80px;
@@ -169,8 +172,20 @@ class reviews extends WP_Widget {
             <div class = "testimonial">
             <div class="testimonial-header">
                 Excellent';
-                  $display.=' <div class = "gnrl-new-class" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating"><span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span><div class = "basic" data-average = "' . $List->rating . '" data-id = "pn-widget-rich-snippets-'.$newi.'"></div></div> 
-            </div>
+                  $notrating = 5 - $List->rating;
+                  $display.= '<div class="ratings" itemprop="reviewRating" itemscope="" itemtype="http://schema.org/Rating">';
+                  $display.= '<span itemprop="ratingValue" style="display:none;">' . $List->rating . '</span>';
+                  $display.= '<div data-average = "' . $List->rating . '">';
+                  for($i=0;$i<$List->rating;$i++){
+                    
+                    $display.=' <div style="display:inline-block;"><img src="'.get_bloginfo("wpurl").'/wp-content/plugins/wp-social-seo/images/star_full.png"></div> ';
+                  }
+                  for($j=0;$j<$notrating;$j++){
+                   $display.=' <div  style="display:inline-block;"><img src="'.get_bloginfo("wpurl").'/wp-content/plugins/wp-social-seo/images/star_empty.png"></div> '; 
+                  }
+                  $display.= '</div>';
+                  $display.=' </div>
+                      </div>
                <div class = "bottom-class">
            <div class = "gnrl-class" itemprop="itemReviewed" itemscope itemtype="http://schema.org/Thing"><span itemprop="name">' . stripcslashes($List->item_name) . '</span></div>
           </div>
